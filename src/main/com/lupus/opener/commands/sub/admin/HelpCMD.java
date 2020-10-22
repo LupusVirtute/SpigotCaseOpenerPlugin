@@ -8,6 +8,7 @@ package com.lupus.opener.commands.sub.admin;
 import com.lupus.command.framework.commands.LupusCommand;
 import com.lupus.command.framework.commands.PlayerCommand;
 import com.lupus.opener.commands.CaseCMD;
+import com.lupus.opener.messages.GeneralMessages;
 import com.lupus.utils.ColorUtil;
 import org.bukkit.entity.Player;
 
@@ -23,6 +24,10 @@ public class HelpCMD extends PlayerCommand {
 
 	@Override
 	public void run(Player executor, String[] args) {
+		if (!executor.hasPermission("case.admin.key.add")) {
+			executor.sendMessage(GeneralMessages.INSUFFICIENT_PERMISSIONS.toString());
+			return;
+		}
 		executor.sendMessage(message);
 		for (LupusCommand command : new CaseCMD().getSubCommands()) {
 			executor.sendMessage(command.getUsageDesc());

@@ -211,7 +211,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 		dropTable.addItem(item,weight);
 	}
 	public CaseItem getRandomItem(){
-		return dropTable.getRandomItem();
+		return dropTable.getRandomItem().clone();
 	}
 	@Override
 	public Map<String,Object> serialize(){

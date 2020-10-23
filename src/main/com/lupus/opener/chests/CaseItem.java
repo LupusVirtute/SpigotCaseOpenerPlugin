@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CaseItem implements ConfigurationSerializable {
+public class CaseItem implements ConfigurationSerializable,Cloneable {
 	static Material[] applicableStarTracks = new Material[]{
 		Material.DIAMOND_SWORD,
 		Material.DIAMOND_SPADE,
@@ -42,8 +42,19 @@ public class CaseItem implements ConfigurationSerializable {
 		Material.STONE_PICKAXE,
 
 	};
+
+	@Override
+	protected CaseItem clone() {
+		return new CaseItem(this);
+	}
+
 	private ItemStack item;
 	private final int weight;
+	public CaseItem(CaseItem item)
+	{
+		weight = item.getWeight();
+		this.item = item.getItem().clone();
+	}
 	public CaseItem(@NotNull ItemStack item,int weight){
 		this.item = item;
 		this.weight = weight;
@@ -62,6 +73,7 @@ public class CaseItem implements ConfigurationSerializable {
 		else
 			weight = 0;
 	}
+
 	public static ItemStack addStarTrack(ItemStack starTrack){
 		Material starTrackMat = starTrack.getType();
 		boolean applicable = false;

@@ -17,6 +17,9 @@ public class OpenerManager {
 	public static void setPlayerOpener(Player p,OpeningCase mcCase){
 		setPlayerOpener(p.getUniqueId(),mcCase);
 	}
+	public static void removePlayerOpener(Player p){
+		playerOpener.remove(p.getUniqueId());
+	}
 	public static void setPlayerOpener(UUID p,OpeningCase mcCase){
 		playerOpener.put(p,mcCase);
 	}

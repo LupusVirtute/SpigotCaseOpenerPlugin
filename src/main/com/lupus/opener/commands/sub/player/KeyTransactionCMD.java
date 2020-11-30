@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public class KeyTransactionCMD extends PlayerCommand {
 	public KeyTransactionCMD(){
 		super("dajklucz",
-				usage("/skrzynki dajklucz","[skrzynia] [gracz] [ilosc]"),3);
+				usage("/dajklucz","[skrzynia] [gracz] [ilosc]"),3);
 	}
 	@Override
 	public void run(Player player, String[] args) {

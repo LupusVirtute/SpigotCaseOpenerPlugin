@@ -25,7 +25,7 @@ import java.util.*;
 
 public class MinecraftCase implements ConfigurationSerializable {
 	HashMap<UUID,Integer> keys;
-	List<Location> chests;
+	List<Location> chests = new ArrayList<>();
 	CaseItemHolder dropTable;
 	Material icon;
 
@@ -74,14 +74,15 @@ public class MinecraftCase implements ConfigurationSerializable {
 				Object obj = map.get("locations");
 				if (obj instanceof List) {
 					chests = (List<Location>)obj;
+					if (chests == null)
+						chests = new ArrayList<>();
 					for (int i=0;i<chests.size() ;i++ ) {
 							ChestManager.addCaseLocation(chests.get(i),name);
-						}	
+						}
 				}
 			}else{
 				chests = new ArrayList<>();
 			}
-			weight = dropTable.recalculateWeightMax();
 	}
 
 	public MinecraftCase(
@@ -131,10 +132,10 @@ public class MinecraftCase implements ConfigurationSerializable {
 		Random rnd = new Random();
 		ItemStack[] itms = new ItemStack[rnd.nextInt(55)+30];
 		for (int i=0,j=itms.length-1;i<j;i++){
-			itms[i] = getRandomItem().getItem();
+			itms[i] = new ItemStack(getRandomItem().getItem());
 		}
-		CaseItem winner =  getRandomItem();
-		itms[itms.length-1] = winner.getItem();
+		CaseItem winner =  new CaseItem(getRandomItem());
+		itms[itms.length-1] = winner.getItem().clone();
 		int weightMax = dropTable.recalculateWeightMax();
 
 		float winnerPercentage = ((float)winner.getWeight())/((float)weightMax);
@@ -192,6 +193,8 @@ public class MinecraftCase implements ConfigurationSerializable {
 	}
 	public void addChestLocation(Location location){
 		ChestManager.addCaseLocation(location,name);
+		if (chests == null)
+			chests = new ArrayList<>();
 		chests.add(location);
 	}
 	public CaseItemHolder getDropTable(){return dropTable;}
@@ -233,6 +236,11 @@ public class MinecraftCase implements ConfigurationSerializable {
 		serializedMap.put("locations",chests);
 
 		return serializedMap;
+	}
+	public void setWeight(int weight){
+		if (weight < 0)
+			return;
+		this.weight = weight;
 	}
 	public void save(){
 		File chestFile = new File(CaseOpener.getMainDataFolder() + "/chests/" + name + ".yml");

@@ -36,7 +36,7 @@ public class CaseItemList extends Paginator {
 			lore.add(ColorUtil.text2Color("&a&lSzansa: &c" +df2.format(chance)+"%"));
 			meta.setLore(lore);
 			item.setItemMeta(meta);
-			ItemEditor itemEditor = new ItemEditor(getInventoryName(), n, mcCase);
+			ItemEditor itemEditor = new ItemEditor(minecraftCase.getName(), n, mcCase);
 
 			this.addItemStack(new SelectableItemEditor(item,itemEditor,player));
 			n++;
@@ -45,17 +45,21 @@ public class CaseItemList extends Paginator {
 	}
 
 	private void openNewItemCreation(Player p){
-		ItemEditor itemEditor = new ItemEditor(getInventoryName(), mcCase.getDropTable().getItemCount()-1, mcCase);
+		if (!p.hasPermission("case.admin"))
+			return;
+		ItemEditor itemEditor = new ItemEditor(getInventoryName(), mcCase.getDropTable().getItemCount(), mcCase);
 		itemEditor.open(p);
 	}
 
 	@Override
+	public void onClickedItemNull(Player player, InventoryClickEvent inventoryClickEvent) {
+		openNewItemCreation(player);
+	}
+
+	@Override
 	public void onSlotInteraction(Player player, InventoryClickEvent e) {
-		ItemStack item = e.getCurrentItem();
-		if (item == null || item.getType() == Material.AIR){
-			openNewItemCreation(player);
+		if (!player.hasPermission("case.admin"))
 			return;
-		}
 		super.onSlotInteraction(player, e);
 	}
 

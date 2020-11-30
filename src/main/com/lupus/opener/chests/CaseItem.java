@@ -16,27 +16,27 @@ import java.util.Map;
 public class CaseItem implements ConfigurationSerializable,Cloneable {
 	static Material[] applicableStarTracks = new Material[]{
 		Material.DIAMOND_SWORD,
-		Material.DIAMOND_SPADE,
+		Material.DIAMOND_SHOVEL,
 		Material.DIAMOND_AXE,
 		Material.DIAMOND_HOE,
 		Material.DIAMOND_PICKAXE,
-		Material.WOOD_SWORD,
-		Material.WOOD_SPADE,
-		Material.WOOD_AXE,
-		Material.WOOD_HOE,
-		Material.WOOD_PICKAXE,
-		Material.GOLD_SWORD,
-		Material.GOLD_SPADE,
-		Material.GOLD_AXE,
-		Material.GOLD_HOE,
-		Material.GOLD_PICKAXE,
+		Material.WOODEN_SWORD,
+		Material.WOODEN_AXE,
+		Material.WOODEN_SHOVEL,
+		Material.WOODEN_HOE,
+		Material.WOODEN_PICKAXE,
+		Material.GOLDEN_SWORD,
+		Material.GOLDEN_SHOVEL,
+		Material.GOLDEN_AXE,
+		Material.GOLDEN_HOE,
+		Material.GOLDEN_PICKAXE,
 		Material.IRON_SWORD,
-		Material.IRON_SPADE,
+		Material.IRON_SHOVEL,
 		Material.IRON_AXE,
 		Material.IRON_HOE,
 		Material.IRON_PICKAXE,
 		Material.STONE_SWORD,
-		Material.STONE_SPADE,
+		Material.STONE_SHOVEL,
 		Material.STONE_AXE,
 		Material.STONE_HOE,
 		Material.STONE_PICKAXE,
@@ -53,7 +53,7 @@ public class CaseItem implements ConfigurationSerializable,Cloneable {
 	public CaseItem(CaseItem item)
 	{
 		weight = item.getWeight();
-		this.item = item.getItem().clone();
+		this.item = new ItemStack(item.getItem());
 	}
 	public CaseItem(@NotNull ItemStack item,int weight){
 		this.item = item;
@@ -85,7 +85,7 @@ public class CaseItem implements ConfigurationSerializable,Cloneable {
 		}
 		if (!applicable)
 			return starTrack;
-
+		starTrack = new ItemStack(starTrack);
 		starTrack = NBTEditor.set(starTrack,0,"StarKiller");
 		ItemMeta meta = starTrack.getItemMeta();
 		meta.setDisplayName(ColorUtil.text2Color(ItemStackUtil.getItemStackName(starTrack)+" &4&lStarKiller"));

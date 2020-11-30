@@ -21,7 +21,7 @@ public class ItemEditor extends GUI {
 	int index;
 	MinecraftCase mcCase;
 	ItemStack itemEdited;
-	ItemStack info = new ItemStack(Material.STAINED_GLASS_PANE,1,(short)11);
+	ItemStack info = new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
 	public ItemEditor(String invName,
 					  int index,
 					  MinecraftCase caseEdited) {
@@ -44,13 +44,13 @@ public class ItemEditor extends GUI {
 
 		Skulls.intToSkullConverter(inv,value,0,8);
 		ItemMeta meta;
-		ItemStack accept = new ItemStack(Material.STAINED_GLASS_PANE,1,(short)5);
+		ItemStack accept = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 		meta = accept.getItemMeta();
 		meta.setDisplayName(ColorUtil.text2Color("&a&lAkceptuj Zmiany"));
 		accept.setItemMeta(meta);
 		inv.setItem(23,accept);
 
-		ItemStack cancel = new ItemStack(Material.STAINED_GLASS_PANE,1,(short)14);
+		ItemStack cancel = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 		meta = cancel.getItemMeta();
 		meta.setDisplayName(ColorUtil.text2Color("&4&lAnuluj"));
 		accept.setItemMeta(meta);
@@ -76,6 +76,12 @@ public class ItemEditor extends GUI {
 		info.setItemMeta(meta);
 		inv.setItem(13,info);
 	}
+
+	@Override
+	public void onClickedItemNull(Player player, InventoryClickEvent e) {
+		click(player, e);
+	}
+
 	@Override
 	public void click(Player player, InventoryClickEvent e) {
 		ItemStack clickedItem = e.getCurrentItem();
@@ -87,6 +93,8 @@ public class ItemEditor extends GUI {
 			}
 			case 22:{
 				if(e.getClick().isRightClick()){
+					if (clickedItem == null)
+						return;
 					PlayerRelated.addItemToPlayerInventory(player,e.getCurrentItem());
 				}
 				if (e.getClick().isLeftClick() && e.getCursor() != null){
@@ -101,7 +109,9 @@ public class ItemEditor extends GUI {
 			}
 
 		}
-		if (Skulls.isThisItemANumberSkull(clickedItem)) {
+		if (clickedItem == null)
+			return;
+		if (Skulls.isThisItemANumberSkull(new ItemStack(clickedItem))) {
 			double pow = Math.pow(10, Math.abs(clickedSlot % 9 - 8));
 			System.out.println("Pow:"+pow);
 			if (e.getClick().isLeftClick()) {

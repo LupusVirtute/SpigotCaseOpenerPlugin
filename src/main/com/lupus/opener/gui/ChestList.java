@@ -23,12 +23,11 @@ public class ChestList extends Paginator {
 					new ItemStack(Material.CHEST),
 					ColorUtil.text2Color(mcCase.getOfficialName())
 			);
-			ItemStackUtil.setItemLore(chest,
-					new String[]{
-							ColorUtil.text2Color("&cCena : &6" + mcCase.getPrice()+ "$"),
-							ColorUtil.text2Color("&cWażność : &3" + mcCase.getCaseWeight()),
-					}
-			);
+			String[] lore = new String[2];
+			lore[0] = ColorUtil.text2Color("&cCena : &6" + mcCase.getPrice()+ "$");
+			if (p.hasPermission("case.admin"))
+				lore[1] = ColorUtil.text2Color("&cWażność : &3" + mcCase.getCaseWeight());
+			ItemStackUtil.setItemLore(chest,lore);
 			addItemStack(new SelectableCase(chest,mcCase,p.getUniqueId()));
 		}
 		setPage(0);

@@ -79,7 +79,7 @@ public class CaseItemHolder implements ConfigurationSerializable {
 		for(int i=0;i<items.size();i++){
 			chance -= items.get(i).getWeight();
 			if(chance < 0){
-				stack = items.get(i);
+				stack = new CaseItem(items.get(i));
 				break;
 			}
 		}

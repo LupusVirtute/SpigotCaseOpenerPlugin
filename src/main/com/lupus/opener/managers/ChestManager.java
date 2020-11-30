@@ -17,9 +17,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
-public class ChestManager {
+public final class ChestManager {
 	private static final HashMap<String, MinecraftCase> mcCases = new HashMap<>();
 	private static final HashMap<Location,String> mcCaseLocation = new HashMap<>();
+
+	public static void clear(){
+		mcCaseLocation.clear();
+		mcCases.clear();
+	}
 	static int highestWeight = 0;
 	public static void addCase(@NotNull MinecraftCase mcCase){
 		if (mcCase.getCaseWeight() > highestWeight){

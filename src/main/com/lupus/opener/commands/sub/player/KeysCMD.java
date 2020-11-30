@@ -11,7 +11,7 @@ public class KeysCMD extends PlayerCommand {
 	public KeysCMD() {
 		super(
 				"klucze",
-				Usage.usage("/skrzynki klucze"),
+				Usage.usage("/klucze"),
 				"Pokazuje ilość kluczy",
 				0);
 	}
@@ -19,6 +19,7 @@ public class KeysCMD extends PlayerCommand {
 	@Override
 	protected void run(Player player, String[] strings) {
 		MinecraftKey[] keys = ChestManager.getKeysForPlayer(player);
+		player.sendMessage(ColorUtil.text2Color("&6&l----- &e&lKlucze  &e-----"));
 		for (MinecraftKey key : keys) {
 			player.sendMessage(
 					ColorUtil.text2Color(

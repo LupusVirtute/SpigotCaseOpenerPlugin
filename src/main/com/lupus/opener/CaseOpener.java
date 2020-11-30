@@ -1,6 +1,7 @@
 package com.lupus.opener;
 
 import com.lupus.command.framework.commands.ILupusCommand;
+import com.lupus.command.framework.commands.LupusCommand;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.CaseItemHolder;
 import com.lupus.opener.chests.MinecraftCase;
@@ -8,10 +9,13 @@ import com.lupus.opener.chests.PlayerKey;
 import com.lupus.opener.commands.CaseCMD;
 import com.lupus.opener.commands.PlayerSupCommand;
 import com.lupus.opener.commands.sub.player.BuyKeyCMD;
+import com.lupus.opener.commands.sub.player.ChangeKeyCMD;
 import com.lupus.opener.commands.sub.player.KeyTransactionCMD;
 import com.lupus.opener.commands.sub.player.KeysCMD;
 import com.lupus.opener.listeners.BlockManipulationListener;
+import com.lupus.opener.listeners.PvEListener;
 import com.lupus.opener.managers.ChestManager;
+import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -23,6 +27,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Description;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.bukkit.plugin.java.annotation.plugin.Website;
@@ -31,28 +36,35 @@ import org.bukkit.plugin.java.annotation.plugin.author.Author;
 import java.io.File;
 
 @Plugin(name="LupusCaseOpener", version="1.0-SNAPSHOT")
-@Description(desc = "Simple case opener")
-@Author(name = "LupusVirtute")
-@Website(url="github.com/PuccyDestroyerxXx")
+@Description(value = "Simple case opener")
+@Author(value = "LupusVirtute")
+@Website(value = "github.com/PuccyDestroyerxXx")
 
-@Dependency(plugin = "Vault")
-@Dependency(plugin = "LupusCommandFramework")
-@Dependency(plugin = "MCGUIFramework")
-@Dependency(plugin = "LupusUtils")
-@Dependency(plugin = "LupusDrop")
+@Dependency(value = "Vault")
+@Dependency(value = "LupusCommandFramework")
+@Dependency(value = "MCGUIFramework")
+@Dependency(value = "LupusUtils")
+@Dependency(value = "LuckPerms")
+@ApiVersion(value =  ApiVersion.Target.v1_15)
 
-@Commands({
+/*@Commands({
 	@org.bukkit.plugin.java.annotation.command.Command(name = "case",desc = "admin case manager",permission = "case.admin"),
 	@org.bukkit.plugin.java.annotation.command.Command(name = "skrzynki",desc = "player case command",permission = "case.player"),
 	@org.bukkit.plugin.java.annotation.command.Command(name = "klucze",desc = "player key command",permission = "case.player"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "dajklucz",desc = "player give key command",permission = "case.player")
-})
+	@org.bukkit.plugin.java.annotation.command.Command(name = "dajklucz",desc = "player give key command",permission = "case.player"),
+	@org.bukkit.plugin.java.annotation.command.Command(name = "kupklucz",desc = "player give key command",permission = "case.player"),
+	@org.bukkit.plugin.java.annotation.command.Command(name = "zamienklucz",desc = "player give key command",permission = "case.player"),
+})*/
 public class CaseOpener extends JavaPlugin {
 	static File dataFolder;
 	static JavaPlugin plugin;
+	static LuckPerms api;
 	private static Economy econ = null;
 	public static File getMainDataFolder(){
 		return dataFolder;
+	}
+	public static LuckPerms getLuckPermsAPI(){
+		return api;
 	}
 
 	public static JavaPlugin getMainPlugin() {
@@ -70,11 +82,13 @@ public class CaseOpener extends JavaPlugin {
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+		setupLuckPerms();
 		loadSerializedClasses();
 		Bukkit.getLogger().info("Hooked into Vault");
 		plugin = this;
 		dataFolder = this.getDataFolder();
 		getServer().getPluginManager().registerEvents(new BlockManipulationListener(),plugin);
+		getServer().getPluginManager().registerEvents(new PvEListener(),plugin);
 		Bukkit.getLogger().info("Started Loading Chests");
 		loadChests();
 		Bukkit.getLogger().info("Chests loaded");
@@ -85,6 +99,7 @@ public class CaseOpener extends JavaPlugin {
 		ChestManager.saveAll(false);
 	}
 	public static void loadChests() {
+		ChestManager.clear();
 		File chestDir = new File(dataFolder+"/chests");
 		Bukkit.getLogger().info(chestDir.getPath());
 		File[] chestFiles = chestDir.listFiles();
@@ -113,12 +128,20 @@ public class CaseOpener extends JavaPlugin {
 		econ = rsp.getProvider();
 		return econ != null;
 	}
+	void setupLuckPerms(){
+		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+		if (provider != null) {
+			api = provider.getProvider();
+		}
+	}
+/*
 	public ILupusCommand[] lupusCommands = {
 		new CaseCMD(),
 		new PlayerSupCommand(),
 		new KeyTransactionCMD(),
 		new KeysCMD(),
 		new BuyKeyCMD(),
+		new ChangeKeyCMD(),
 	};
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -131,4 +154,5 @@ public class CaseOpener extends JavaPlugin {
 		}
 		return super.onCommand(sender, command, label, args);
 	}
+	*/
 }

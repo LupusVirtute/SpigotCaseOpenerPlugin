@@ -56,3 +56,7 @@ CASE_OPENING_BACKGROUND_GLASS_NAME: '&6Space&5MC'
 CASE_OPENING_BACKGROUND_GLASS_LORE: 'Jak chcesz wyjść naciśnij tutaj'
 
 CASE_PLACED_PROPERLY: "&aPostawiono poprawnie skrzynie"
+STATTRACK_KILLS_FORMATING: '&4&lStarKiller\n&cKills : &4%amount%'
+STATTRACK_KILLS_NAME: '%name% &4&lStarKiller'
+NULL_ITEM_IN_HAND: 'Chyba sobie robisz żarty z tym powietrzem'
+STATTRACK_ITEM_SET_PROPERLY: 'Poprawnie ustanowiono StarKillera na itemie'

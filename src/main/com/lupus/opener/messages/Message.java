@@ -57,7 +57,10 @@ public enum Message {
 	CASE_OPENING_POINTER_GLASS_LORE,
 	CASE_OPENING_POINTER_GLASS_NAME,
 
-
+	STATTRACK_KILLS_FORMATING,
+	STATTRACK_KILLS_NAME,
+	NULL_ITEM_IN_HAND,
+	STATTRACK_ITEM_SET_PROPERLY,
 	CASE_PLACED_PROPERLY,
 	;
 	private static final char REPLACEMENT_CHAR = '%';
@@ -74,7 +77,7 @@ public enum Message {
 		CaseOpener.getMainPlugin().saveResource("Messages.yml",false);
 		FileConfiguration config = ConfigUtility.getConfig("Messages.yml");
 		for (Message value : values()) {
-			setText(config.getString(value.name()));
+			setText(config.getString(value.name() ));
 		}
 	}
 	@Override

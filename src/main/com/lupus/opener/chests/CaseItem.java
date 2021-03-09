@@ -3,16 +3,15 @@ package com.lupus.opener.chests;
 import com.lupus.gui.utils.ItemUtility;
 import com.lupus.gui.utils.NBTUtility;
 import com.lupus.gui.utils.TextUtility;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CaseItem implements ConfigurationSerializable,Cloneable {
 	static Material[] applicableStarTracks = new Material[]{
@@ -92,15 +91,20 @@ public class CaseItem implements ConfigurationSerializable,Cloneable {
 		starTrack = NBTUtility.setNBTDataValue(starTrack,"StarKiller",0);
 
 		ItemMeta meta = starTrack.getItemMeta();
-		meta.setDisplayName(TextUtility.color(ItemUtility.getItemName(starTrack)+" &4&lStarKiller"));
+		var mrq = new MessageReplaceQuery().
+				addQuery("name",ItemUtility.getItemName(starTrack));
+		meta.setDisplayName(Message.STATTRACK_KILLS_NAME.toString(mrq));
 
 		List<String> lore = meta.getLore();
 		if (lore == null) {
 			lore = new ArrayList<>();
 		}
+		mrq = new MessageReplaceQuery().
+				addQuery("amount","0");
 
-		lore.add(TextUtility.color("&b&lStarKiller"));
-		lore.add(TextUtility.color("&cKills : &40"));
+		String[] statTrackMessages = Message.STATTRACK_KILLS_FORMATING.toString(mrq).split("\\n");
+
+		lore.addAll(Arrays.asList(statTrackMessages));
 		meta.setLore(lore);
 		starTrack.setItemMeta(meta);
 		return starTrack;

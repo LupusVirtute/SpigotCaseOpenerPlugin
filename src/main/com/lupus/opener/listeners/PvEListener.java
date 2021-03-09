@@ -2,6 +2,8 @@ package com.lupus.opener.listeners;
 
 import com.lupus.gui.utils.NBTUtility;
 import com.lupus.gui.utils.TextUtility;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,13 +31,17 @@ public class PvEListener implements Listener {
 		if (NBTUtility.hasNBTTag(it,"StarKiller")) {
 			int kills  = NBTUtility.getNBTValue(it, "StarKiller",int.class);
 			kills++;
-			it = NBTUtility.setNBTDataValue(it,"StarKiller",kills);
+
+			NBTUtility.setNBTDataValue(it,"StarKiller",kills);
+
 			ItemMeta meta = it.getItemMeta();
 			List<String> lore = meta.getLore();
 			for (int i=0;i<lore.size();i++){
 				String s = lore.get(i);
 				if (strip(s).contains("Kills")){
-					lore.set(i, TextUtility.color("&cKills : &4"+kills));
+					var mrq = new MessageReplaceQuery().
+							addQuery("amount",kills+"");
+					lore.set(i, Message.STATTRACK_KILLS_FORMATING.toString(mrq));
 				}
 			}
 			meta.setLore(lore);

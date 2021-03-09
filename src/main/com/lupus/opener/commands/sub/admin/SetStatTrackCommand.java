@@ -10,13 +10,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class SetStarTrackCommand extends PlayerCommand {
+public class SetStatTrackCommand extends PlayerCommand {
 	static CommandMeta meta = new CommandMeta().
 			setName("stattrack").
 			setDescription("Sets stat track on item held in hand").
 			setUsage(usage("/case stattrack")).
 			setArgumentAmount(0);
-	public SetStarTrackCommand(){
+	public SetStatTrackCommand(){
 		super(meta);
 	}
 	@Override

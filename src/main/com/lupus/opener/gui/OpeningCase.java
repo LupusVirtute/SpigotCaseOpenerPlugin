@@ -3,10 +3,8 @@ package com.lupus.opener.gui;
 
 import com.lupus.gui.GUI;
 import com.lupus.gui.utils.ItemUtility;
-import com.lupus.gui.utils.TextUtility;
 import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.managers.OpenerManager;
-import com.lupus.opener.messages.GeneralMessages;
 import com.lupus.opener.messages.Message;
 import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.*;

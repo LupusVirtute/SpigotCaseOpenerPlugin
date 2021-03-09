@@ -5,7 +5,6 @@ import com.lupus.command.framework.commands.PlayerCommand;
 import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.GeneralMessages;
 import com.lupus.opener.messages.Message;
 import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;

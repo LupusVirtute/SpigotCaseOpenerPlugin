@@ -8,7 +8,7 @@ import com.lupus.opener.gui.CaseItemList;
 import com.lupus.opener.gui.OpeningCase;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.managers.OpenerManager;
-import com.lupus.opener.messages.GeneralMessages;
+import com.lupus.opener.messages.Message;
 import com.lupus.opener.runnables.ChestOpener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -109,12 +109,12 @@ public class MinecraftCase implements ConfigurationSerializable {
 	}
 	public void openCase(Player player,int amount){
 		if (!hasKey(player)){
-			player.sendMessage(GeneralMessages.NO_KEY.toString());
+			player.sendMessage(Message.NO_KEY.toString());
 			return;
 		}
 		if (amount > 1){
 			if (getKeyAmount(player) < amount) {
-				player.sendMessage(TextUtility.color(GeneralMessages.LOGO.toString()+"&4&lBrak odpowiedniej ilości kluczy"));
+				player.sendMessage(Message.NOT_ENOUGH_KEYS.toString());
 				return;
 			}
 			removeKey(player, amount);
@@ -124,7 +124,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 			return;
 		}
 		if (OpenerManager.getPlayerOpeningCase(player) != null){
-			player.sendMessage(TextUtility.color("&4&lJuż otwierasz skrzynie"));
+			player.sendMessage(Message.ALERADY_OPENING.toString());
 			return;
 		}
 

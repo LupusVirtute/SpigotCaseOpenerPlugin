@@ -1,11 +1,11 @@
 package com.lupus.opener.managers;
 
 
-import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.chests.MinecraftKey;
-import com.lupus.opener.messages.GeneralMessages;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import com.lupus.opener.runnables.ASyncSave;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,11 +71,14 @@ public final class ChestManager {
 		}
 		else{
 			long time = System.currentTimeMillis();
-			Bukkit.broadcastMessage(TextUtility.color(GeneralMessages.LOGO.toString() + " Zapisywanie skrzyn moze wystapic lag"));
+			Bukkit.broadcastMessage(Message.SAVING_INIT.toString());
 			for (MinecraftCase actualCase : mcCases.values()) {
 				actualCase.save();
 			}
-			Bukkit.broadcastMessage(TextUtility.color(GeneralMessages.LOGO.toString() + " &aPoprawnie zapisano skrzynie czas: &6 " + (System.currentTimeMillis()	- time)/1000));
+			time = (System.currentTimeMillis()	- time)/1000;
+			var mrq = new MessageReplaceQuery().
+					addQuery("amount",time+"");
+			Bukkit.broadcastMessage(Message.SAVING_END.toString(mrq));
 		}
 	}
 }

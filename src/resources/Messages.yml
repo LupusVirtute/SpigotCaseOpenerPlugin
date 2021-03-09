@@ -60,3 +60,8 @@ STATTRACK_KILLS_FORMATING: '&4&lStarKiller\n&cKills : &4%amount%'
 STATTRACK_KILLS_NAME: '%name% &4&lStarKiller'
 NULL_ITEM_IN_HAND: 'Chyba sobie robisz żarty z tym powietrzem'
 STATTRACK_ITEM_SET_PROPERLY: 'Poprawnie ustanowiono StarKillera na itemie'
+NO_KEY: "&4Nie posiadasz klucza do tej skrzyni"
+ALERADY_OPENING: '&cJuż otwierasz skrzynie'
+SAVING_INIT: '&6Zapisywanie skrzyń może wystąpić lag.'
+SAVING_END: '&aPoprawnie zapisano skrzynie czas: &6%amount%s'
+INSUFFICIENT_MONEY: "&4Potrzebujesz &6%price%&2$ &4by kupić tą usługe"

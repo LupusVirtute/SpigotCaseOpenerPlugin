@@ -53,7 +53,9 @@ public class BuyKeyCMD extends PlayerCommand {
 		DecimalFormat df2 = new DecimalFormat("#.##");
 
 		if ((price > kesz)) {
-			executor.sendMessage(EconomyMessages.INSUFFICIENT_MONEY.toString(df2.format(price)));
+			var mrq = new MessageReplaceQuery().
+					addQuery("price",df2.format(price));
+			executor.sendMessage(Message.INSUFFICIENT_MONEY.toString(mrq));
 			return;
 		}
 

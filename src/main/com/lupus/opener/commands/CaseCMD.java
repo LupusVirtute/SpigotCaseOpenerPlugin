@@ -25,7 +25,7 @@ public class CaseCMD extends SupCommand {
 						new SaveCasesCMD(),
 						new EditWeightCMD(),
 						new ReloadAllCMD(),
-						new SetStarTrackCommand(),
+						new SetStatTrackCommand(),
 				});
 	}
 }

@@ -1,0 +1,58 @@
+DESTROY_MESSAGE_ON: "&4Włączono niszczenie lokacji skrzyń"
+DESTROY_MESSAGE_OFF: "&4Wyłączono niszczenie lokacji skrzyń"
+CASE_EXISTS: "&4&lSkrzynia istnieje"
+CASE_GIVEN_DONT_EXISTS: "&4Skrzynia o nazwie &6&l%chest% nie istnieje"
+
+COMMAND_CREATE_SUCCESSFUL: "&aPoprawnie stworzono skrzynie"
+
+COMMAND_EDIT_WEIGHT_SUCCESS: "&a&lUstawiono nową wagę skrzyni poprawnie"
+
+COMMAND_GET_CASE_SUCCESS: "&4&lMasz i sie baw smierdzielu"
+
+COMMAND_GIVE_KEY_SUCCESS_MESSAGE_PLAYER: "&aAdmin &6%player% &aDal ci &6%amount% &akluczy do %chest%"
+COMMAND_GIVE_KEY_SUCCESS_MESSAGE_ADMIN: "&6Dałeś graczowi &a%player% &b%amount%  &6kluczy do %chest% &6skrzyni"
+
+COMMAND_TAKE_KEY_SUCCESS_MESSAGE_PLAYER: "&aAdmin &6%player% &aZabrał ci &6%amount%&a kluczy do %chest"
+COMMAND_TAKE_KEY_SUCCESS_MESSAGE_ADMIN: "&6Zabrałeś graczowi &a%player% &b%amount%  &6kluczy do %chest% &6skrzyni"
+COMMAND_TAKE_KEY_FAIL_NO_KEYS_LEFT: "&4&lGosciu juz nie ma kluczy odpusc mu"
+
+COMMAND_BUY_KEY_BOUGHT: "&aKupiłeś &6%chest% &akluczy do %chest%\n %&9Za &6%price%"
+COMMAND_CHANGE_KEY_NEED: "&4&lNie posiadasz tyle kluczy Potrzebujesz: %amount%"
+COMMAND_CHANGE_KEY_SUCCESS: "&9Zamieniłeś &6%needed_amount% &9kluczy z %chest% na &6%amount% Kluczy z %chest2%"
+
+CHEST_LIST_INVENTORY_NAME: 'Skrzynki'
+
+COMMAND_KEYS_TOP: "&6&l----- &e&lKlucze  &e-----"
+COMMAND_KEYS_BOTTOM: ''
+COMMAND_KEYS_KEY: '&6%chest% &5: &9%amount%'
+
+QUANTITY_MORE_THAN_ZERO: "&4&lIlosc musi być większa od zera"
+NOT_ENOUGH_KEYS: "&4&lNie posiadasz tyle kluczy"
+
+KEY_SEND_SUCCESS_SENDER: "&9Wysłałeś &6%amount% &9kluczy do &a%player% &9do %chest%"
+KEY_SEND_SUCCESS_RECEIVER: "&9Dostałeś &6%amount% &9kluczy od &a%player% &9do %chest%"
+
+BUY_CASE_INVENTORY_NAME: '&1Kup klucz'
+BUY_CASE_PRICE_LORE: '&9Cena &4: &e%price%'
+
+DROP_CHANCE_LORE: '&a&lSzansa: &c%chance% %'
+
+CHEST_LIST_PLAYER_LORE: '&cCena &6: %price% $'
+CHEST_LIST_ADMIN_LORE: '&cWaga skrzyni : &3%amount%'
+
+ITEM_EDITOR_ACCEPT_NAME: '&a&lAkceptuj Zmiany'
+ITEM_EDITOR_DENY_NAME: '&4&lAnuluj'
+ITEM_EDITOR_INFO_NAME: '&9&lInformacje'
+
+ITEM_EDITOR_INFO_LORE: '&6&lSzansa &7&l: &4&l%chance%\n
+                        &6&lW skrzyni &7&l: &4&l%chest%'
+WINNER_MESSAGE: '"&cGracz &6%player% &cotworzyl skrzynie\n
+                &cWygrał %item_name% &b %amount%x'
+
+
+CASE_OPENING_POINTER_GLASS_NAME: '&6Space&5MC'
+CASE_OPENING_POINTER_GLASS_LORE: 'Otwieranie Skrzynki...'
+CASE_OPENING_BACKGROUND_GLASS_NAME: '&6Space&5MC'
+CASE_OPENING_BACKGROUND_GLASS_LORE: 'Jak chcesz wyjść naciśnij tutaj'
+
+CASE_PLACED_PROPERLY: "&aPostawiono poprawnie skrzynie"

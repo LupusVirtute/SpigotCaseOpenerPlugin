@@ -1,24 +1,24 @@
 package com.lupus.opener.commands;
 
-import com.lupus.command.framework.commands.LupusCommand;
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
-import com.lupus.opener.commands.sub.admin.OpenEditorCMD;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.gui.ChestList;
-import com.lupus.utils.ColorUtil;
+import com.lupus.opener.messages.Message;
 import org.bukkit.entity.Player;
 
 public class PlayerSupCommand extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().
+			setName("skrzynie").
+			setUsage(usage("/skrzynie")).
+			setDescription("Pokazuje drop i liste itemow").
+			setArgumentAmount(0);
 	public PlayerSupCommand() {
-		super(
-				"skrzynie",
-				"/skrzynie",
-				"Pokazuje drop i liste itemów",
-				0
-				);
+		super(meta);
 	}
 	@Override
-	protected void run(Player player, String[] strings) {
-		ChestList list = new ChestList(ColorUtil.text2Color("&a&lSkrzynki"),player);
+	protected void run(Player player, ArgumentList args) {
+		ChestList list = new ChestList(Message.CHEST_LIST_INVENTORY_NAME.toString(),player);
 		list.open(player);
 	}
 }

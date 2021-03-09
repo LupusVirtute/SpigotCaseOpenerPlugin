@@ -1,9 +1,10 @@
 package com.lupus.opener.listeners;
 
+import com.lupus.gui.utils.NBTUtility;
+import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.NBTEditor;
+import com.lupus.opener.messages.Message;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public class BlockManipulationListener implements Listener {
 		if (isTimeForDestroy){
 			boolean b = ChestManager.removeCaseLocation(block);
 			if (b)
-				p.sendMessage(ColorUtil.text2Color("&a&lUsunięto bez problemu lokacje skrzyni"));
+				p.sendMessage(TextUtility.color("&a&lUsunięto bez problemu lokacje skrzyni"));
 		}
 	}
 	@EventHandler
@@ -65,14 +66,14 @@ public class BlockManipulationListener implements Listener {
 			return;
 		ItemStack item = e.getItemInHand();
 		String data;
-		data = NBTEditor.getString(item,"case");
+		data = NBTUtility.getNBTValue(item,"case",String.class);
 		if (data == null) {
 			return;
 		}
 		MinecraftCase mcCase = ChestManager.getCase(data);
 		if (mcCase != null){
 			mcCase.addChestLocation(e.getBlockPlaced().getLocation());
-			e.getPlayer().sendMessage(ChatColor.GREEN + "Postawiono poprawnie skrzynie");
+			e.getPlayer().sendMessage(Message.CASE_PLACED_PROPERLY.toString());
 		}
 	}
 }

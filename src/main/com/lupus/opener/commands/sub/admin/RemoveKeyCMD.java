@@ -1,63 +1,56 @@
 package com.lupus.opener.commands.sub.admin;
 
 
-
-
-
-
-
-
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
-import org.apache.commons.lang.math.NumberUtils;
-import org.bukkit.Bukkit;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;
 
 public class RemoveKeyCMD extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().
+			addPermission("case.admin.key.remove").
+			setName("removekey").
+			setUsage(usage("/case removekey","[case] [name] [ilosc]")).
+			setDescription(colorText("&6Zabierasz klucz graczowi &b&l[name] &6do skrzyni &b&l[case] &6i z iloscia &b&l[ilosc]")).
+			setArgumentAmount(3);
+
 	public RemoveKeyCMD(){
-		super(
-				"removekey",
-				usage("/case removekey","[case] [name] [ilosc]"),
-				ColorUtil.text2Color("&6Zabierasz klucz graczowi &b&l[name] &6do skrzyni &b&l[case] &6i z iloscia &b&l[ilosc]"),
-				3
-		);
+		super(meta);
 	}
 	@Override
-	public void run(Player executor, String[] args) {
-		if (!executor.hasPermission("case.admin.key.remove")) {
-			executor.sendMessage(GeneralMessages.INSUFFICIENT_PERMISSIONS.toString());
-			return;
-		}
-		MinecraftCase mcCase = ChestManager.getCase(args[0]);
+	public void run(Player executor, ArgumentList args) throws Exception {
+		String chestName = args.getArg(String.class,0);
+		Player player2nd = args.getArg(Player.class,1);
+		int amount = args.getArg(int.class,2);
+
+		MinecraftCase mcCase = ChestManager.getCase(chestName);
 		if (mcCase == null) {
-			executor.sendMessage(ColorUtil.text2Color("&4&lNie ma takiej skrzyni"));
+			var mrq = new MessageReplaceQuery().
+					addQuery("chest",chestName);
+			executor.sendMessage(Message.CASE_GIVEN_DONT_EXISTS.toString(mrq));
 			return;
 		}
-		Player player2nd = Bukkit.getPlayerExact(args[1]);
-		if (player2nd == null) {
-			executor.sendMessage(GeneralMessages.PLAYER_OFFLINE.toString());
-			return;
-		}
-		if (!NumberUtils.isNumber(args[2])){
-			executor.sendMessage(ColorUtil.text2Color("&6&l"+args[2] + " &4To nie liczba"));
-			return;
-		}
+
 		if (!mcCase.hasKey(player2nd)) {
-			executor.sendMessage(ColorUtil.text2Color("&4&lGosciu juz nie ma kluczy odpusc mu"));
+			executor.sendMessage(colorText(Message.COMMAND_TAKE_KEY_FAIL_NO_KEYS_LEFT.toString()));
 			return;
 		}
-		int amount = Integer.parseInt(args[2]);
 		if (mcCase.getKeyAmount(player2nd) < amount){
 			amount = mcCase.getKeyAmount(player2nd);
 		}
 		mcCase.removeKey(player2nd,amount);
+		var mrq = new MessageReplaceQuery().
+				addQuery("player",executor.getName()).
+				addQuery("amount",String.valueOf(amount)).
+				addQuery("chest",mcCase.getOfficialName());
 		player2nd.sendMessage(
-				ColorUtil.text2Color("&aAdmin &6" + executor.getName()+" &aZabrał ci &6" +amount +"&a kluczy do " +mcCase.getOfficialName())
+				Message.COMMAND_TAKE_KEY_SUCCESS_MESSAGE_PLAYER.toString(mrq)
 		);
-		executor.sendMessage(ColorUtil.text2Color("&6Zabrałeś graczowi &a"+player2nd.getName()+" &b"+amount+"  &6kluczy do "+mcCase.getOfficialName()+" &6skrzyni"));
-		return;
+		mrq.addQuery("player",player2nd.getName());
+		executor.sendMessage(Message.COMMAND_TAKE_KEY_SUCCESS_MESSAGE_ADMIN.toString(mrq));
 	}
 }

@@ -1,74 +1,94 @@
 package com.lupus.opener.commands.sub.admin;
 
 
-
-
-
-
-
-
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
-import org.apache.commons.lang.math.NumberUtils;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public class GiveKeyCMD extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().
+			setName("givekey").
+			setUsage(usage("/case givekey","[case] [name] [ilosc]")).
+			setDescription(colorText("&6Dajesz klucz graczowi &b&l[name] &6do skrzyni &b&l[case] &6i z iloscia &b&l[ilosc]")).
+			addPermission("case.admin.key.add").
+			setArgumentAmount(3);
 	public GiveKeyCMD() {
-		super("givekey",
-				usage("/case givekey","[case] [name] [ilosc]"),
-				ColorUtil.text2Color("&6Dajesz klucz graczowi &b&l[name] &6do skrzyni &b&l[case] &6i z iloscia &b&l[ilosc]"),
-				3);
+		super(meta);
 	}
 
 	@Override
-	public void run(Player executor, String[] args) {
-		if (!executor.hasPermission("case.admin.key.add")) {
-			executor.sendMessage(GeneralMessages.INSUFFICIENT_PERMISSIONS.toString());
+	public void run(Player executor, ArgumentList args) throws Exception {
+		String chest = args.getArg(String.class,0);
+		String playerName = args.getArg(String.class,1);
+		Integer amount = args.getArg(int.class,2);
+
+		if(chest.equals("*")){
+			giveAllCasesTo(executor, args);
 			return;
 		}
-		if(args[0].equals("*")){
-			for(MinecraftCase theCase : ChestManager.getAllCases()){
-				args[0] = theCase.getName();
-				String[] argsBetter = Arrays.copyOf(args,args.length);
-				this.executeAsync(executor,argsBetter, CaseOpener.getMainPlugin());
-			}
-			return;
-		}
-		MinecraftCase mcCase = ChestManager.getCase(args[0]);
+
+		MinecraftCase mcCase = ChestManager.getCase(chest);
 		if (mcCase == null) {
-			executor.sendMessage(ColorUtil.text2Color("&4&lNie ma takiej skrzyni"));
+			var mpq = new MessageReplaceQuery().
+					addQuery("chest",chest);
+			executor.sendMessage(colorText(Message.CASE_GIVEN_DONT_EXISTS.toString(mpq)));
 			return;
 		}
-		if (args[1].equals("*")) {
-			for(Player p : Bukkit.getOnlinePlayers()){
-				args[1] = p.getName();
-				String[] argsBetter = Arrays.copyOf(args,args.length);
-				this.executeAsync(executor,argsBetter, CaseOpener.getMainPlugin());
-			}
+
+		if (playerName.equals("*")) {
+			giveCaseToAll(executor, args);
 			return;
 		}
-		Player player2nd = Bukkit.getPlayerExact(args[1]);
+
+		Player player2nd = Bukkit.getPlayerExact(playerName);
+		UUID uuid = null;
 		if (player2nd == null) {
-			executor.sendMessage(GeneralMessages.PLAYER_OFFLINE.toString());
-			return;
+			OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+			uuid = player.getUniqueId();
 		}
-		if (!NumberUtils.isNumber(args[2])){
-			executor.sendMessage(ColorUtil.text2Color("&6&l"+args[3] + " &4To nie liczba"));
-			return;
+		else
+			uuid = player2nd.getUniqueId();
+
+		mcCase.giveKey(uuid,amount);
+		var mrq = new MessageReplaceQuery().
+				addQuery("player",executor.getName()).
+				addQuery("amount",String.valueOf(amount)).
+				addQuery("chest",mcCase.getOfficialName());
+
+		if (player2nd != null) {
+			player2nd.sendMessage(
+					Message.COMMAND_GIVE_KEY_SUCCESS_MESSAGE_PLAYER.toString(mrq)
+			);
 		}
-		int amount = Integer.parseInt(args[2]);
-		mcCase.giveKey(player2nd,amount);
-		player2nd.sendMessage(
-				ColorUtil.text2Color("&aAdmin &6" + executor.getName()+" &aDal ci &6" +amount +"&a kluczy do " +mcCase.getOfficialName())
-		);
-		executor.sendMessage(ColorUtil.text2Color("&6Dałeś graczowi &a"+player2nd.getName()+" &b"+amount+"  &6kluczy do "+mcCase.getOfficialName()+" &6skrzyni"));
-		return;
+
+		mrq.addQuery("player", playerName);
+		executor.sendMessage(Message.COMMAND_GIVE_KEY_SUCCESS_MESSAGE_ADMIN.toString(mrq));
+	}
+	private void giveAllCasesTo(Player executor, ArgumentList args){
+		for(MinecraftCase theCase : ChestManager.getAllCases()){
+			String chest = theCase.getName();
+			String[] argsBetter = Arrays.copyOf(args.toArray(new String[0]),args.size());
+			argsBetter[0] = chest;
+			this.executeAsync(executor,argsBetter, CaseOpener.getMainPlugin());
+		}
+	}
+	private void giveCaseToAll(Player executor, ArgumentList args){
+		for(Player p : Bukkit.getOnlinePlayers()){
+			String playerName = p.getName();
+			String[] argsBetter = Arrays.copyOf(args.toArray(new String[0]),args.size());
+			argsBetter[1] = playerName;
+			this.executeAsync(executor,argsBetter, CaseOpener.getMainPlugin());
+		}
 	}
 }

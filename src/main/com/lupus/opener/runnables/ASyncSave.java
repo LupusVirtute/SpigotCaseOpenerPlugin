@@ -1,8 +1,8 @@
 package com.lupus.opener.runnables;
 
+import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -16,11 +16,11 @@ public class ASyncSave extends BukkitRunnable {
 	@Override
 	public void run() {
 		long time = System.currentTimeMillis();
-		Bukkit.broadcastMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString() + " Zapisywanie skrzyn moze wystapic lag"));
+		Bukkit.broadcastMessage(TextUtility.color(GeneralMessages.LOGO.toString() + " Zapisywanie skrzyn moze wystapic lag"));
 		for (MinecraftCase actualCase : mcCases.values()) {
 			actualCase.save();
 		}
-		Bukkit.broadcastMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString() + " &aPoprawnie zapisano skrzynie czas: &6 " + (System.currentTimeMillis()	- time)/1000));
+		Bukkit.broadcastMessage(TextUtility.color(GeneralMessages.LOGO.toString() + " &aPoprawnie zapisano skrzynie czas: &6 " + (System.currentTimeMillis()	- time)/1000));
 
 	}
 }

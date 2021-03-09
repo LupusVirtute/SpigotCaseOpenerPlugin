@@ -1,7 +1,8 @@
 package com.lupus.opener.chests;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.ItemStackUtil;
-import com.lupus.utils.NBTEditor;
+
+import com.lupus.gui.utils.ItemUtility;
+import com.lupus.gui.utils.NBTUtility;
+import com.lupus.gui.utils.TextUtility;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -83,18 +84,23 @@ public class CaseItem implements ConfigurationSerializable,Cloneable {
 				break;
 			}
 		}
+
 		if (!applicable)
 			return starTrack;
+
 		starTrack = new ItemStack(starTrack);
-		starTrack = NBTEditor.set(starTrack,0,"StarKiller");
+		starTrack = NBTUtility.setNBTDataValue(starTrack,"StarKiller",0);
+
 		ItemMeta meta = starTrack.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color(ItemStackUtil.getItemStackName(starTrack)+" &4&lStarKiller"));
+		meta.setDisplayName(TextUtility.color(ItemUtility.getItemName(starTrack)+" &4&lStarKiller"));
+
 		List<String> lore = meta.getLore();
 		if (lore == null) {
 			lore = new ArrayList<>();
 		}
-		lore.add(ColorUtil.text2Color("&b&lStarKiller"));
-		lore.add(ColorUtil.text2Color("&cKills : &40"));
+
+		lore.add(TextUtility.color("&b&lStarKiller"));
+		lore.add(TextUtility.color("&cKills : &40"));
 		meta.setLore(lore);
 		starTrack.setItemMeta(meta);
 		return starTrack;

@@ -1,44 +1,57 @@
 package com.lupus.opener.commands.sub.player;
 
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
-import org.bukkit.Bukkit;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class KeyTransactionCMD extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().setName("dajklucz").
+			setUsage(usage("/dajklucz","[skrzynia] [gracz] [ilosc]")).
+			setArgumentAmount(3);
 	public KeyTransactionCMD(){
-		super("dajklucz",
-				usage("/dajklucz","[skrzynia] [gracz] [ilosc]"),3);
+		super(meta);
 	}
 	@Override
-	public void run(Player player, String[] args) {
-		MinecraftCase mcCase = ChestManager.getCase(args[0]);
+	public void run(Player player, ArgumentList args) throws Exception{
+		String chest = args.getArg(String.class,0);
+		OfflinePlayer player2 = args.getArg(OfflinePlayer.class,1);
+		int amount = args.getArg(int.class,2);
+
+		MinecraftCase mcCase = ChestManager.getCase(chest);
 		if (mcCase == null){
-			player.sendMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString() +" &4&l"+args[0]+" &c&lTo nie skrzynia"));
+			var mrq = new MessageReplaceQuery().
+					addQuery("chest",chest);
+			player.sendMessage(Message.CASE_GIVEN_DONT_EXISTS.toString(mrq));
 			return;
 		}
-		Player player2 = Bukkit.getPlayerExact(args[1]);
-		if (player2 == null){
-			player.sendMessage(GeneralMessages.PLAYER_OFFLINE.toString());
-			return;
-		}
-		int amount = Integer.parseInt(args[2]);
+
 		if (amount <= 0) {
-			player.sendMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString()+" &4&lIlosc musi być większa od zera"));
+			player.sendMessage(Message.QUANTITY_MORE_THAN_ZERO.toString());
 			return;
 		}
+
 		if (amount > mcCase.getKeyAmount(player)){
-			player.sendMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString()+" &4&lNie posiadasz tyle kluczy"));
+			player.sendMessage(Message.NOT_ENOUGH_KEYS.toString());
 			return;
 		}
 		mcCase.removeKey(player,amount);
-		mcCase.giveKey(player2,amount);
+		mcCase.giveKey(player2.getUniqueId(),amount);
 
-		player.sendMessage(ColorUtil.text2Color("&9Wysłałeś &6"+amount+" &9kluczy do &a"+args[1]));
-		player2.sendMessage(ColorUtil.text2Color("&9Dostałeś &6"+amount+" &9kluczy od &a"+player.getName()));
+		var mrq = new MessageReplaceQuery().
+				addQuery("chest",chest).
+				addQuery("amount",amount+"").
+				addQuery("player",player2.getName());
+		player.sendMessage(Message.KEY_SEND_SUCCESS_SENDER.toString(mrq));
+		mrq.addQuery("player",player.getName());
+		if (player2.isOnline())
+			player2.getPlayer().sendMessage(Message.KEY_SEND_SUCCESS_RECEIVER.toString(mrq));
 
 	}
 }

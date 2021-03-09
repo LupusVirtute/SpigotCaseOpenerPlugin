@@ -1,34 +1,38 @@
 package com.lupus.opener.commands.sub.admin;
 
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.LupusCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.utils.ColorUtil;
-import org.apache.commons.lang.math.NumberUtils;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.command.CommandSender;
 
-import java.util.List;
-
 public class EditWeightCMD extends LupusCommand {
+	static CommandMeta meta = new CommandMeta().
+			addPermission("case.admin").
+			setName("editweight").
+			setDescription(colorText("&4&lEdytuje wage skrzyni")).
+			setUsage(usage("/case editweight","[case] [newweight]")).
+			setArgumentAmount(2);
 	public EditWeightCMD() {
-		super("editweight", usage("/case editweight","[case] [newweight]"), ColorUtil.text2Color("&4&lEdytuje wage skrzyni"),2);
+		super(meta);
 	}
 
 	@Override
-	public void run(CommandSender commandSender, String[] args) {
-		if (!commandSender.hasPermission("case.admin"))
-			return;
-		MinecraftCase minecraftCase = ChestManager.getCase(args[0]);
+	public void run(CommandSender commandSender, ArgumentList args) throws Exception {
+		String chest = args.getArg(String.class,0);
+		int weight = args.getArg(int.class,1);
+
+		MinecraftCase minecraftCase = ChestManager.getCase(chest);
 		if (minecraftCase == null) {
-			commandSender.sendMessage(ColorUtil.text2Color("&4Skrzynia o nazwie &6&l" + args[0]+ " nie istnieje"));
+			var mrq = new MessageReplaceQuery().
+					addQuery("chest",chest);
+			commandSender.sendMessage(colorText(Message.CASE_GIVEN_DONT_EXISTS.toString(mrq)));
 			return;
 		}
-		if (NumberUtils.isNumber(args[1])){
-			commandSender.sendMessage(ColorUtil.text2Color("&4&lTo nie jest numer padalcu"));
-			return;
-		}
-		int weight = Integer.parseInt(args[1]);
 		minecraftCase.setWeight(weight);
-		commandSender.sendMessage(ColorUtil.text2Color("&a&lUstawiono nową wagę skrzyni poprawnie"));
+		commandSender.sendMessage(colorText(Message.COMMAND_EDIT_WEIGHT_SUCCESS.toString()));
 	}
 }

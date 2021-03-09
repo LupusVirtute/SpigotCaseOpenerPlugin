@@ -1,5 +1,8 @@
 package com.lupus.opener.chests;
 
+import com.lupus.gui.utils.NBTUtility;
+import com.lupus.gui.utils.TextUtility;
+import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.gui.CaseItemList;
 import com.lupus.opener.gui.OpeningCase;
@@ -7,9 +10,6 @@ import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.managers.OpenerManager;
 import com.lupus.opener.messages.GeneralMessages;
 import com.lupus.opener.runnables.ChestOpener;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.NBTEditor;
-import com.lupus.utils.PlayerRelated;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -114,17 +114,17 @@ public class MinecraftCase implements ConfigurationSerializable {
 		}
 		if (amount > 1){
 			if (getKeyAmount(player) < amount) {
-				player.sendMessage(ColorUtil.text2Color(GeneralMessages.LOGO.toString()+"&4&lBrak odpowiedniej ilości kluczy"));
+				player.sendMessage(TextUtility.color(GeneralMessages.LOGO.toString()+"&4&lBrak odpowiedniej ilości kluczy"));
 				return;
 			}
 			removeKey(player, amount);
 			for (int i=0;i<amount;i++){
-				PlayerRelated.addItemToPlayerInventory(player,getRandomItem().getItem());
+				InventoryUtility.addItemStackToPlayerInventory(player,getRandomItem().getItem());
 			}
 			return;
 		}
 		if (OpenerManager.getPlayerOpeningCase(player) != null){
-			player.sendMessage(ColorUtil.text2Color("&4&lJuż otwierasz skrzynie"));
+			player.sendMessage(TextUtility.color("&4&lJuż otwierasz skrzynie"));
 			return;
 		}
 
@@ -139,7 +139,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 		int weightMax = dropTable.recalculateWeightMax();
 
 		float winnerPercentage = ((float)winner.getWeight())/((float)weightMax);
-		OpeningCase mcCase = new OpeningCase(ColorUtil.text2Color(officialName),itms,itms.length-1,winnerPercentage);
+		OpeningCase mcCase = new OpeningCase(TextUtility.color(officialName),itms,itms.length-1,winnerPercentage);
 
 		OpenerManager.setPlayerOpener(player,mcCase);
 		player.openInventory(mcCase.getInventory());
@@ -188,7 +188,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 	}
 	public ItemStack giveCase(){
 		ItemStack chest = new ItemStack(Material.CHEST);
-		chest = NBTEditor.set(chest,name,"case");
+		chest = NBTUtility.setNBTDataValue(chest,"case",name);
 		return chest;
 	}
 	public void addChestLocation(Location location){

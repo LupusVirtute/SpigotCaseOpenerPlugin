@@ -1,11 +1,15 @@
 package com.lupus.opener.gui;
 
 import com.lupus.gui.Paginator;
+import com.lupus.gui.utils.ItemUtility;
+import com.lupus.gui.utils.TextUtility;
+import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.gui.selectables.SelectableCommand;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.utils.ColorUtil;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
@@ -17,27 +21,30 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 public class BuyCaseGUI extends Paginator {
 	static DecimalFormat df2 = new DecimalFormat("#.###");
 	public BuyCaseGUI(Player player) {
-		super(ColorUtil.text2Color("&1&lKup Klucz"));
+		super(Message.BUY_CASE_INVENTORY_NAME.toString());
 		for (MinecraftCase mcCase : ChestManager.getAllCases()) {
 			ItemStack its = new ItemStack(Material.CHEST);
 			double price = mcCase.getPrice();
 			if (player.hasPermission("case.premium")){
 				price = getPrice(player,price);
 			}
+			ItemUtility.setItemTitle(its,TextUtility.color(mcCase.getOfficialName()));
+
 			ItemMeta meta = its.getItemMeta();
-			meta.setDisplayName(ColorUtil.text2Color(mcCase.getOfficialName()));
-			List<String> lore = new ArrayList<>();
-			lore.add(
-				ColorUtil.text2Color(
-					"Cena: "+df2.format(price)
-				)
-			);
+
+			var mrq = new MessageReplaceQuery().
+					addQuery("price",df2.format(price));
+			String[] messages = Message.BUY_CASE_PRICE_LORE.toString(mrq).split("\\n");
+
+			List<String> lore = new ArrayList<>(Arrays.asList(messages));
+
 			meta.setLore(lore);
 			its.setItemMeta(meta);
 			addItemStack(new SelectableCommand(its,"kupklucz "+mcCase.getName()+" 1"));

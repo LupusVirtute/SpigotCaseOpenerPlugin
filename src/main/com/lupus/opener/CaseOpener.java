@@ -1,31 +1,20 @@
 package com.lupus.opener;
 
-import com.lupus.command.framework.commands.ILupusCommand;
-import com.lupus.command.framework.commands.LupusCommand;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.CaseItemHolder;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.chests.PlayerKey;
-import com.lupus.opener.commands.CaseCMD;
-import com.lupus.opener.commands.PlayerSupCommand;
-import com.lupus.opener.commands.sub.player.BuyKeyCMD;
-import com.lupus.opener.commands.sub.player.ChangeKeyCMD;
-import com.lupus.opener.commands.sub.player.KeyTransactionCMD;
-import com.lupus.opener.commands.sub.player.KeysCMD;
 import com.lupus.opener.listeners.BlockManipulationListener;
 import com.lupus.opener.listeners.PvEListener;
 import com.lupus.opener.managers.ChestManager;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Description;
@@ -43,7 +32,6 @@ import java.io.File;
 @Dependency(value = "Vault")
 @Dependency(value = "LupusCommandFramework")
 @Dependency(value = "MCGUIFramework")
-@Dependency(value = "LupusUtils")
 @Dependency(value = "LuckPerms")
 @ApiVersion(value =  ApiVersion.Target.v1_15)
 

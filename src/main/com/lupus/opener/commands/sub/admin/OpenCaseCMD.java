@@ -1,38 +1,42 @@
 package com.lupus.opener.commands.sub.admin;
 
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;
 
 public class OpenCaseCMD extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().
+			addPermission("case.admin.open").
+			setName("open").
+			setUsage(usage("/case open","[name]")).
+			setDescription(colorText("&6Otwierasz skrzynie test&5O&bw&5O")).
+			setArgumentAmount(1);
 	public OpenCaseCMD(){
-		super(
-				"open",
-				usage("/case open","[name]"),
-				ColorUtil.text2Color("&6Otwierasz skrzynie test&5O&bw&5O"),
-				1
-		);
+		super(meta);
 	}
 	@Override
-	public void run(Player executor, String[] args) {
-		if (!executor.hasPermission("case.admin.open")) {
-			executor.sendMessage(GeneralMessages.INSUFFICIENT_PERMISSIONS.toString());
-			return;
-		}
+	public void run(Player executor, ArgumentList args) throws Exception {
+		String chestName = args.getArg(String.class,0);
 		int amount = 1;
-		if (args.length >= 2) {
-			amount = Integer.parseInt(args[1]);
+		try{
+			amount = args.getArg(int.class,1);
 			amount = amount <= 0 ? 1 : amount;
 		}
-		MinecraftCase minecraftCase = ChestManager.getCase(args[0]);
+		catch (Exception ignored){}
+
+
+		MinecraftCase minecraftCase = ChestManager.getCase(chestName);
 		if (minecraftCase == null) {
-			executor.sendMessage(ColorUtil.text2Color("&4Skrzynia o nazwie &6&l" + args[0]+ " nie istnieje"));
+			var mrq = new MessageReplaceQuery().
+					addQuery("chest",chestName);
+			executor.sendMessage(colorText(Message.CASE_GIVEN_DONT_EXISTS.toString(mrq)));
 			return;
 		}
 		minecraftCase.openCase(executor,amount);
-		return;
 	}
 }

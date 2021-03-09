@@ -1,12 +1,13 @@
 package com.lupus.opener.gui;
 
 import com.lupus.gui.Paginator;
+import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.CaseItemHolder;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.gui.selectables.SelectableItemEditor;
-import com.lupus.utils.ColorUtil;
-import org.bukkit.Material;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CaseItemList extends Paginator {
@@ -32,10 +34,20 @@ public class CaseItemList extends Paginator {
 			if(lore == null){
 				lore = new ArrayList<>();
 			}
-			float chance = (((float)caseItem.getWeight()/(float)dropItems.getMaxWeight())*100);
-			lore.add(ColorUtil.text2Color("&a&lSzansa: &c" +df2.format(chance)+"%"));
+			float chance;
+			chance = ((float)caseItem.getWeight())/((float)dropItems.getMaxWeight());
+			chance *= 100;
+
+			var mrq = new MessageReplaceQuery().
+					addQuery("chance",df2.format(chance));
+
+			String[] messages = Message.DROP_CHANCE_LORE.toString(mrq).split("\\n");
+
+			lore.addAll(Arrays.asList(messages));
+
 			meta.setLore(lore);
 			item.setItemMeta(meta);
+
 			ItemEditor itemEditor = new ItemEditor(minecraftCase.getName(), n, mcCase);
 
 			this.addItemStack(new SelectableItemEditor(item,itemEditor,player));

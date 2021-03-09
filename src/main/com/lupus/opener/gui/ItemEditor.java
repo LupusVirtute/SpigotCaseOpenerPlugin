@@ -1,17 +1,22 @@
 package com.lupus.opener.gui;
 
 import com.lupus.gui.GUI;
+import com.lupus.gui.utils.ItemUtility;
+import com.lupus.gui.utils.SkullUtility;
+import com.lupus.gui.utils.TextUtility;
+import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.MinecraftCase;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.PlayerRelated;
-import com.lupus.utils.Skulls;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import javax.annotation.processing.Messager;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class ItemEditor extends GUI {
@@ -42,38 +47,41 @@ public class ItemEditor extends GUI {
 			}
 		}
 
-		Skulls.intToSkullConverter(inv,value,0,8);
+		SkullUtility.intToSkullConverter(inv,value,0,8);
 		ItemMeta meta;
 		ItemStack accept = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
 		meta = accept.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color("&a&lAkceptuj Zmiany"));
+		meta.setDisplayName(Message.ITEM_EDITOR_ACCEPT_NAME.toString());
 		accept.setItemMeta(meta);
 		inv.setItem(23,accept);
 
 		ItemStack cancel = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 		meta = cancel.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color("&4&lAnuluj"));
+		meta.setDisplayName(Message.ITEM_EDITOR_DENY_NAME.toString());
 		accept.setItemMeta(meta);
 		inv.setItem(21,cancel);
 
 		inv.setItem(22,itemEdited);
 
 		meta = info.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color("&9&lInformacje!"));
+		meta.setDisplayName(Message.ITEM_EDITOR_INFO_NAME.toString());
 		updateInfoMeta();
 		info.setItemMeta(meta);
 		inv.setItem(13,info);
 
 	}
+	static DecimalFormat format = new DecimalFormat("#.#####");
 	public void updateInfoMeta(){
-		ItemMeta meta = info.getItemMeta();
-		float chance = (((float)value/((float)weightMax))*100);
-		meta.setLore(Arrays.asList(
-				ColorUtil.text2Color("&6&lSzansa &7&l: &4&l " + chance),
-				ColorUtil.text2Color("&6&lW skrzyni &7&l: &4&l"+ mcCase.getOfficialName())
-				)
-		);
-		info.setItemMeta(meta);
+		float chance = (float)value/ (float)weightMax;
+		chance *= 100;
+		var mrq = new MessageReplaceQuery().
+				addQuery("chance",format.format(chance)).
+				addQuery("chest", mcCase.getOfficialName());
+
+		String[] messages = Message.ITEM_EDITOR_INFO_LORE.toString(mrq).split("\\n");
+
+		ItemUtility.setItemLore(info,messages);
+
 		inv.setItem(13,info);
 	}
 
@@ -84,6 +92,9 @@ public class ItemEditor extends GUI {
 
 	@Override
 	public void click(Player player, InventoryClickEvent e) {
+		if (e.getRawSlot() >= getInventory().getSize()) {
+			e.setCancelled(false);
+		}
 		ItemStack clickedItem = e.getCurrentItem();
 		int clickedSlot = e.getRawSlot();
 		switch (clickedSlot){
@@ -95,10 +106,11 @@ public class ItemEditor extends GUI {
 				if(e.getClick().isRightClick()){
 					if (clickedItem == null)
 						return;
-					PlayerRelated.addItemToPlayerInventory(player,e.getCurrentItem());
+					InventoryUtility.addItemStackToPlayerInventory(player,e.getCurrentItem());
 				}
 				if (e.getClick().isLeftClick() && e.getCursor() != null){
-					inv.setItem(22,e.getCursor());
+					inv.setItem(22,new ItemStack(e.getCursor()));
+					e.getView().setCursor(new ItemStack(Material.AIR));
 				}
 				return;
 			}
@@ -111,9 +123,8 @@ public class ItemEditor extends GUI {
 		}
 		if (clickedItem == null)
 			return;
-		if (Skulls.isThisItemANumberSkull(new ItemStack(clickedItem))) {
+		if (SkullUtility.isThisItemNumberSkull(new ItemStack(clickedItem))) {
 			double pow = Math.pow(10, Math.abs(clickedSlot % 9 - 8));
-			System.out.println("Pow:"+pow);
 			if (e.getClick().isLeftClick()) {
 				addValue((int) pow);
 			}
@@ -122,25 +133,26 @@ public class ItemEditor extends GUI {
 			}
 			return;
 		}
-		e.setCancelled(false);
 		return;
 	}
 	public void addValue(int valueAmount){
 		value += valueAmount;
-		System.out.println("Value:"+value);
 		if (value >= MAX_VALUE)
 			value = 1;
 		else if(value <= 0) {
 			value = 1;
 		}
-		Skulls.intToSkullConverter(inv,value,0,8);
+		SkullUtility.intToSkullConverter(inv,value,0,8);
 		updateInfoMeta();
 	}
 	@Override
 	public void onClose(Player p){
-		return;
 	}
 	public void updateCase(){
-		mcCase.setItemAt(new CaseItem(inv.getItem(22).clone(),value),index);
+		ItemStack item = inv.getItem(22);
+		if (item == null)
+			return;
+
+		mcCase.setItemAt(new CaseItem(new ItemStack(item),value),index);
 	}
 }

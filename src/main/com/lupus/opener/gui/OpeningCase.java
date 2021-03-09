@@ -2,11 +2,13 @@ package com.lupus.opener.gui;
 
 
 import com.lupus.gui.GUI;
+import com.lupus.gui.utils.ItemUtility;
+import com.lupus.gui.utils.TextUtility;
+import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.managers.OpenerManager;
 import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.ItemStackUtil;
-import com.lupus.utils.PlayerRelated;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OpeningCase extends GUI {
@@ -41,25 +44,22 @@ public class OpeningCase extends GUI {
 
 		exit = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 		ItemMeta meta = exit.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color(GeneralMessages.LOGO.toString()));
+		meta.setDisplayName(Message.CASE_OPENING_BACKGROUND_GLASS_NAME.toString());
 
-		List<String> lore = new ArrayList<>();
-		lore.add(ColorUtil.text2Color("&aOtwieranie skrzynki..."));
-		lore.add(ColorUtil.text2Color("&4Jak chcesz tylko dostac item to nacisnij na to szkło"));
+		String[] messages = Message.CASE_OPENING_BACKGROUND_GLASS_LORE.toString().split("\\n");
+		List<String> lore = new ArrayList<>(Arrays.asList(messages));
 
 		meta.setLore(lore);
 		exit.setItemMeta(meta);
 
-		ItemStack compass = new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
-		meta = compass.getItemMeta();
-		meta.setDisplayName(ColorUtil.text2Color(GeneralMessages.LOGO.toString()));
+		ItemStack pointer = new ItemStack(Material.BLUE_STAINED_GLASS_PANE);
+		ItemUtility.setItemTitle(pointer,Message.CASE_OPENING_POINTER_GLASS_NAME.toString());
+		messages = Message.CASE_OPENING_POINTER_GLASS_LORE.toString().split("\\n");
+		lore = new ArrayList<>(Arrays.asList(messages));
 
-		lore = new ArrayList<>();
-		lore.add(ColorUtil.text2Color("&aOtwieranie skrzynki..."));
-		lore.add(ColorUtil.text2Color("&4Wskaznik..."));
-		meta.setLore(lore);
+		ItemUtility.setItemLore(pointer,lore);
 
-		compass.setItemMeta(meta);
+		pointer.setItemMeta(meta);
 
 		for (int i=0;i<9;i++){
 			inv.setItem(i,exit);
@@ -68,8 +68,8 @@ public class OpeningCase extends GUI {
 			inv.setItem(i,exit);
 		}
 
-		inv.setItem(22,compass);
-		inv.setItem(4,compass);
+		inv.setItem(22, pointer);
+		inv.setItem(4, pointer);
 	}
 	public int getDistanceToWinner(){
 		return winnerIndex-(currentIndex+5);
@@ -94,21 +94,23 @@ public class OpeningCase extends GUI {
 			return;
 		}
 		playerWantsOut = true;
-		PlayerRelated.addItemToPlayerInventory(p,getWinner());
-		if (winnerPercentage < 0.02){
+		InventoryUtility.addItemStackToPlayerInventory(p,getWinner());
+		if (winnerPercentage < 0.01){
 			setUpFireWork(p);
 			f.detonate();
-			Bukkit.broadcastMessage(ColorUtil.text2Color(
-					GeneralMessages.LOGO.toString()+"&cGracz &6"+p.getName()+" &cotworzyl skrzynie i\n"
-					+"&cWygrał "+ ItemStackUtil.getItemStackName(getWinner()) +" &b"
-							+ getWinner().getAmount() + "x"
-			));
+			var mrq = new MessageReplaceQuery().
+					addQuery("player",p.getName()).
+					addQuery("item_name",ItemUtility.getItemName(getWinner())).
+					addQuery("amount",getWinner().getAmount()+"");
+
+			Bukkit.broadcastMessage(Message.WINNER_MESSAGE.toString(mrq));
 		}
 		OpenerManager.setPlayerOpener(p,null);
 		p.playSound(p.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1.0f,1.0f);
 	}
 	static void setUpFireWork(Player p){
-		f = (Firework) p.getWorld().spawn(p.getLocation(), Firework.class);
+
+		f = (Firework) p.getWorld().spawn(p.getLocation().add(0,2,0), Firework.class);
 		FireworkMeta meta = f.getFireworkMeta();
 		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.GREEN).build());
 		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.RED).build());
@@ -149,6 +151,7 @@ public class OpeningCase extends GUI {
 			OpenerManager.setPlayerOpener(p,null);
 	}
 	public boolean doABarrelRoll(Player p){
+
 		if (playerWantsOut) {
 			removePlayerCaseOpening(p);
 			return true;
@@ -178,6 +181,5 @@ public class OpeningCase extends GUI {
 		if (!playerWantsOut)
 			award(p);
 		removePlayerCaseOpening(p);
-		return;
 	}
 }

@@ -1,7 +1,8 @@
 package com.lupus.opener.listeners;
 
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.NBTEditor;
+import com.lupus.gui.utils.NBTUtility;
+import com.lupus.gui.utils.TextUtility;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,16 +26,16 @@ public class PvEListener implements Listener {
 		}
 		PlayerInventory killerInventory = killer.getInventory();
 		ItemStack it = killerInventory.getItemInMainHand();
-		if (NBTEditor.contains(it,"StarKiller")) {
-			int kills = NBTEditor.getInt(it, "StarKiller");
+		if (NBTUtility.hasNBTTag(it,"StarKiller")) {
+			int kills  = NBTUtility.getNBTValue(it, "StarKiller",int.class);
 			kills++;
-			it = NBTEditor.set(it,kills,"StarKiller");
+			it = NBTUtility.setNBTDataValue(it,"StarKiller",kills);
 			ItemMeta meta = it.getItemMeta();
 			List<String> lore = meta.getLore();
 			for (int i=0;i<lore.size();i++){
 				String s = lore.get(i);
-				if (ColorUtil.strip(s).contains("Kills")){
-					lore.set(i,ColorUtil.text2Color("&cKills : &4"+kills));
+				if (strip(s).contains("Kills")){
+					lore.set(i, TextUtility.color("&cKills : &4"+kills));
 				}
 			}
 			meta.setLore(lore);
@@ -42,5 +43,8 @@ public class PvEListener implements Listener {
 			killerInventory.setItemInMainHand(it);
 			killer.updateInventory();
 		}
+	}
+	public String strip(String s){
+		return ChatColor.stripColor(s);
 	}
 }

@@ -1,39 +1,33 @@
 package com.lupus.opener.commands.sub.admin;
 
 
-
-
-
-
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.listeners.BlockManipulationListener;
-import com.lupus.opener.messages.GeneralMessages;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.Usage;
+import com.lupus.opener.messages.Message;
 import org.bukkit.entity.Player;
 
 public class AllowDestructionCMD extends PlayerCommand {
-
+	static CommandMeta meta = new CommandMeta().
+			setName("destroy").
+			setUsage(usage("/case destroy","[yes/no]")).
+			setDescription(colorText("&6Pozwala lub nie pozwala na niszczenie miejsc skrzyń &a&lyes&0&l/&4&lno")).
+			addPermission("case.admin.remove").
+			setArgumentAmount(1);
 	public AllowDestructionCMD() {
-		super("destroy",
-				Usage.usage("/case destroy","[yes/no]"),
-				ColorUtil.text2Color("&6Pozwala lub nie pozwala na niszczenie miejsc skrzyń &a&lyes&0&l/&4&lno"),
-				1);
+		super(meta);
 	}
 
 	@Override
-	protected void run(Player executor, String[] args) {
-		if (!executor.hasPermission("case.admin.remove")) {
-			executor.sendMessage(GeneralMessages.INSUFFICIENT_PERMISSIONS.toString());
-			return;
-		}
-		if (args[0].contains("yes")) {
+	protected void run(Player executor, ArgumentList args) throws Exception {
+		String argument = args.getArg(String.class,0);
+		if (argument.contains("yes")) {
 			BlockManipulationListener.isTimeForDestroy = true;
-			executor.sendMessage(ColorUtil.text2Color("&4Włączono niszczenie lokacji skrzyń"));
+			executor.sendMessage(colorText(Message.DESTROY_MESSAGE_ON.toString()));
 		} else {
 			BlockManipulationListener.isTimeForDestroy = false;
-			executor.sendMessage(ColorUtil.text2Color("&4Wyłączono niszczenie lokacji skrzyń"));
+			executor.sendMessage(colorText(Message.DESTROY_MESSAGE_OFF.toString()));
 		}
-		return;
 	}
 }

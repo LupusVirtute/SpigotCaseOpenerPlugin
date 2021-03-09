@@ -1,49 +1,44 @@
 package com.lupus.opener.commands.sub.admin;
 
 
-
-
-
-
-
-
+import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
+import com.lupus.command.framework.commands.arguments.ArgumentList;
+import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.utils.ColorUtil;
-import com.lupus.utils.PlayerRelated;
-import org.apache.commons.lang.math.NumberUtils;
-import org.bukkit.ChatColor;
+import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class GetCaseCMD extends PlayerCommand {
+	static CommandMeta meta = new CommandMeta().
+			setName("get").
+			setUsage(usage("/case get","[nazwa] [ilosc]")).
+			setDescription(colorText("&9Dostajesz skrzynie z ktorej bedzie mozna otwierac")).
+			addPermission("case.admin.get").
+			setArgumentAmount(2);
 	public GetCaseCMD() {
-		super("get",
-				usage("/case get","[nazwa] [ilosc]"),
-				ColorUtil.text2Color("&9Dostajesz skrzynie z ktorej bedzie mozna otwierac"),
-				2);
+		super(meta);
 	}
 
 	@Override
-	public void run(Player executor, String[] args) {
-		if (!executor.hasPermission("case.admin.get"))
-			return;
-		if (!NumberUtils.isNumber(args[1])){
-			executor.sendMessage(ChatColor.DARK_RED+"Jak nie wiesz jak pisać liczby to wypierdalaj");
-			return;
-		}
-		boolean exists = ChestManager.contains(args[0]);
-		if (!exists){
-			executor.sendMessage(ColorUtil.text2Color("&4&lCase nie istnieje debilu"));
-			return;
-		}
-		MinecraftCase mcCase = ChestManager.getCase(args[0]);
-		ItemStack stack = mcCase.giveCase();
-		stack.setAmount(Integer.parseInt(args[1]));
-		PlayerRelated.addItemToPlayerInventory(executor,stack);
-		executor.sendMessage(ColorUtil.text2Color("&4&lMasz i sie baw smierdzielu"));
+	public void run(Player executor, ArgumentList args) throws Exception {
+		String chestName = args.getArg(String.class,0);
+		Integer stackAmount = args.getArg(int.class,1);
 
-		return;
+		boolean exists = ChestManager.contains(chestName);
+		if (!exists){
+			var mrq = new MessageReplaceQuery().
+					addQuery("chest",chestName);
+			executor.sendMessage(colorText(Message.CASE_GIVEN_DONT_EXISTS.toString()));
+			return;
+		}
+		MinecraftCase mcCase = ChestManager.getCase(chestName);
+		ItemStack stack = mcCase.giveCase();
+		stack.setAmount(stackAmount);
+		InventoryUtility.addItemStackToPlayerInventory(executor,stack);
+		executor.sendMessage(colorText(Message.COMMAND_GET_CASE_SUCCESS.toString()));
 	}
 }

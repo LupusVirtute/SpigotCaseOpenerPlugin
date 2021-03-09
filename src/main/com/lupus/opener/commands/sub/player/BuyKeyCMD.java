@@ -7,7 +7,6 @@ import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.gui.BuyCaseGUI;
 import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.EconomyMessages;
 import com.lupus.opener.messages.Message;
 import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.entity.Player;

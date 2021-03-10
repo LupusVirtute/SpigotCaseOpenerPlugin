@@ -7,6 +7,7 @@ import com.lupus.opener.chests.PlayerKey;
 import com.lupus.opener.listeners.BlockManipulationListener;
 import com.lupus.opener.listeners.PvEListener;
 import com.lupus.opener.managers.ChestManager;
+import com.lupus.opener.messages.Message;
 import net.luckperms.api.LuckPerms;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -64,23 +65,39 @@ public class CaseOpener extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		Bukkit.getLogger().info("Loading CaseOpener");
+		info("Loading CaseOpener");
+		plugin = this;
+		dataFolder = this.getDataFolder();
+		info("Hooking into vault");
 		if (!setupEconomy() ) {
 			getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+		info("Hooked into Vault successfully");
+		info("Setting up luck perms");
 		setupLuckPerms();
+		info("Luck Perms API set up");
+
+		info("Loading serialized classes");
 		loadSerializedClasses();
-		Bukkit.getLogger().info("Hooked into Vault");
-		plugin = this;
-		dataFolder = this.getDataFolder();
+		info("Serialized classes loaded");
+
+		info("Loading messages");
+		Message.load();
+		info("All messages loaded!");
+
 		getServer().getPluginManager().registerEvents(new BlockManipulationListener(),plugin);
 		getServer().getPluginManager().registerEvents(new PvEListener(),plugin);
-		Bukkit.getLogger().info("Started Loading Chests");
+
+		info("Started Loading Chests");
 		loadChests();
-		Bukkit.getLogger().info("Chests loaded");
-		Bukkit.getLogger().info("amount:"+ChestManager.getAll().size());
+		info("Chests loaded");
+		info("amount:"+ChestManager.getAll().size());
+
+	}
+	public static void info(String info){
+		Bukkit.getLogger().info(info);
 	}
 	@Override
 	public void onDisable(){
@@ -89,7 +106,7 @@ public class CaseOpener extends JavaPlugin {
 	public static void loadChests() {
 		ChestManager.clear();
 		File chestDir = new File(dataFolder+"/chests");
-		Bukkit.getLogger().info(chestDir.getPath());
+		info(chestDir.getPath());
 		File[] chestFiles = chestDir.listFiles();
 		if(chestFiles == null)
 			return;

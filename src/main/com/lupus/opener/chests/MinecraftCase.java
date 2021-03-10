@@ -1,5 +1,6 @@
 package com.lupus.opener.chests;
 
+import com.lupus.gui.utils.ItemUtility;
 import com.lupus.gui.utils.NBTUtility;
 import com.lupus.gui.utils.TextUtility;
 import com.lupus.gui.utils.nbt.InventoryUtility;
@@ -9,6 +10,7 @@ import com.lupus.opener.gui.OpeningCase;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.managers.OpenerManager;
 import com.lupus.opener.messages.Message;
+import com.lupus.opener.messages.MessageReplaceQuery;
 import com.lupus.opener.runnables.ChestOpener;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,17 +23,18 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.*;
 
 public class MinecraftCase implements ConfigurationSerializable {
-	HashMap<UUID,Integer> keys;
+	Map<UUID,Integer> keys;
 	List<Location> chests = new ArrayList<>();
 	CaseItemHolder dropTable;
 	Material icon;
 
 	String name;
 	String officialName;
-
+	int totalAmountOfKeys = 0;
 	double price;
 	int weight;
 
@@ -60,15 +63,16 @@ public class MinecraftCase implements ConfigurationSerializable {
 				icon = Material.CHEST;
 			}
 			if(map.containsKey("keys")){
-				keys = new HashMap<>();
+				keys = new TreeMap<>();
 				if (map.get("keys") instanceof List) {
 					List<PlayerKey> tempKeys = (List<PlayerKey>) map.get("keys");
 					for (PlayerKey tempKey : tempKeys) {
 						keys.put(tempKey.player,tempKey.amount);
+						totalAmountOfKeys += tempKey.amount;
 					}
 				}
 			}else{
-				keys = new HashMap<>();
+				keys = new TreeMap<>();
 			}
 			if(map.containsKey("locations")){
 				Object obj = map.get("locations");
@@ -98,9 +102,11 @@ public class MinecraftCase implements ConfigurationSerializable {
 		this.price = price;
 		this.weight = weight;
 		this.icon = Material.CHEST;
-		keys = new HashMap<>();
+		keys = new TreeMap<>();
 		chests = new ArrayList<>();
 	}
+
+
 	public boolean openCaseEditor(Player player) {
 		player.closeInventory();
 		CaseItemList caseItemList = new CaseItemList(this,player);
@@ -170,10 +176,11 @@ public class MinecraftCase implements ConfigurationSerializable {
 		return keys.get(p.getUniqueId());
 	}
 	public void giveKey(UUID player,int amount){
-		if (keys.containsKey(player))
-			keys.put(player,keys.get(player)+amount);
-		else
-			keys.put(player,amount);
+		if (!keys.containsKey(player))
+			keys.put(player,0);
+		keys.put(player,keys.get(player)+amount);
+
+		totalAmountOfKeys += amount;
 	}
 	public void removeKey(UUID player,int amount){
 		if(keys.containsKey(player)){
@@ -182,13 +189,14 @@ public class MinecraftCase implements ConfigurationSerializable {
 	}
 	public void removeKey(Player p,int amount){
 		removeKey(p.getUniqueId(),amount);
+		totalAmountOfKeys -= amount;
 	}
 	public void giveKey(Player p,int amount){
 		giveKey(p.getUniqueId(),amount);
 	}
 	public ItemStack giveCase(){
 		ItemStack chest = new ItemStack(Material.CHEST);
-		chest = NBTUtility.setNBTDataValue(chest,"case",name);
+		NBTUtility.setNBTDataValue(chest,"case",name);
 		return chest;
 	}
 	public void addChestLocation(Location location){
@@ -215,6 +223,30 @@ public class MinecraftCase implements ConfigurationSerializable {
 	}
 	public CaseItem getRandomItem(){
 		return dropTable.getRandomItem().clone();
+	}
+	public ItemStack getItemRepresentation(Player caller){
+		final DecimalFormat df2 = new DecimalFormat("#.##");
+		ItemStack chest = new ItemStack(icon);
+		ItemUtility.setItemTitle(
+				chest,
+				TextUtility.color(getOfficialName())
+		);
+
+		var mrq = new MessageReplaceQuery().
+				addQuery("price",df2.format(getPrice())).
+				addQuery("weight",getCaseWeight()+"").
+				addQuery("amount",totalAmountOfKeys+"");
+
+		String[] playerMessages = Message.CHEST_LIST_PLAYER_LORE.toString(mrq).split("\\n");
+		List<String> lore = new ArrayList<>(Arrays.asList(playerMessages));
+
+
+		if (caller.hasPermission("case.admin")){
+			String[] adminMessages = Message.CHEST_LIST_ADMIN_LORE.toString(mrq).split("\\n");
+			lore.addAll(Arrays.asList(adminMessages));
+		}
+		ItemUtility.setItemLore(chest,lore);
+		return chest;
 	}
 	@Override
 	public Map<String,Object> serialize(){
@@ -261,5 +293,32 @@ public class MinecraftCase implements ConfigurationSerializable {
 		}catch(Exception ex){
 			Bukkit.getLogger().info(ex.toString());
 		}
+	}
+
+
+
+	//////// TOP LOGIC ////////
+
+	List<Map.Entry<UUID,Integer>> topCache = new LinkedList<>();
+	private static int sortCompare(Map.Entry<UUID, Integer> o1, Map.Entry<UUID, Integer> o2) {
+		return ((Comparable<Integer>) o1.getValue()).compareTo(o2.getValue());
+	}
+	public void forceTopUpdate(boolean async){
+		if (async) {
+			// I know it should be somwhere else but i am fucking lazy AF
+			Bukkit.getScheduler().runTaskAsynchronously(
+					CaseOpener.getMainPlugin(),
+					()->forceTopUpdate(false)
+			);
+			return;
+		}
+		topCache = new LinkedList<>(keys.entrySet());
+		topCache.sort(MinecraftCase::sortCompare);
+	}
+	public List<Map.Entry<UUID,Integer>> getTopKeys(){
+		if (topCache.size() <= 0) {
+			forceTopUpdate(true);
+		}
+		return topCache;
 	}
 }

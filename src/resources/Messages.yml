@@ -37,7 +37,8 @@ BUY_CASE_PRICE_LORE: '&9Cena &4: &e%price%'
 
 DROP_CHANCE_LORE: '&a&lSzansa: &c%chance% %'
 
-CHEST_LIST_PLAYER_LORE: '&cCena &6: %price% $'
+CHEST_LIST_PLAYER_LORE: '&cCena &6: &2%price% $\n
+                          &cIlość Kluczy ogólnie &6: &a%amount%'
 CHEST_LIST_ADMIN_LORE: '&cWaga skrzyni : &3%amount%'
 
 ITEM_EDITOR_ACCEPT_NAME: '&a&lAkceptuj Zmiany'
@@ -65,3 +66,4 @@ ALERADY_OPENING: '&cJuż otwierasz skrzynie'
 SAVING_INIT: '&6Zapisywanie skrzyń może wystąpić lag.'
 SAVING_END: '&aPoprawnie zapisano skrzynie czas: &6%amount%s'
 INSUFFICIENT_MONEY: "&4Potrzebujesz &6%price%&2$ &4by kupić tą usługe"
+TOP_KEYS_MAIN_INVENTORY_NAME: 'Topcia :3'

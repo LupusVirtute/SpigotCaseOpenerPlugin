@@ -4,10 +4,7 @@ package com.lupus.opener.managers;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.chests.MinecraftKey;
-import com.lupus.opener.messages.Message;
-import com.lupus.opener.messages.MessageReplaceQuery;
-import com.lupus.opener.runnables.ASyncSave;
-import org.bukkit.Bukkit;
+import com.lupus.opener.runnables.ChestSave;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -67,18 +64,10 @@ public final class ChestManager {
 	public static Collection<MinecraftCase> getAllCases() { return mcCases.values();}
 	public static void saveAll(boolean async){
 		if (async) {
-			new ASyncSave(mcCases).runTaskAsynchronously(CaseOpener.getMainPlugin());
+			new ChestSave(mcCases).runTaskAsynchronously(CaseOpener.getMainPlugin());
 		}
 		else{
-			long time = System.currentTimeMillis();
-			Bukkit.broadcastMessage(Message.SAVING_INIT.toString());
-			for (MinecraftCase actualCase : mcCases.values()) {
-				actualCase.save();
-			}
-			time = (System.currentTimeMillis()	- time)/1000;
-			var mrq = new MessageReplaceQuery().
-					addQuery("amount",time+"");
-			Bukkit.broadcastMessage(Message.SAVING_END.toString(mrq));
+			new ChestSave(mcCases).runTask(CaseOpener.getMainPlugin());
 		}
 	}
 }

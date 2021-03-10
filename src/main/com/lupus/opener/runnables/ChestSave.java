@@ -8,9 +8,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 
-public class ASyncSave extends BukkitRunnable {
+public class ChestSave extends BukkitRunnable {
 	HashMap<String, MinecraftCase> mcCases;
-	public ASyncSave(HashMap<String,MinecraftCase> mcCases){
+	public ChestSave(HashMap<String,MinecraftCase> mcCases){
 		this.mcCases = mcCases;
 	}
 	@Override

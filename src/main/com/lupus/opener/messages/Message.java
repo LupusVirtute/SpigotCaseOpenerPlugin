@@ -66,6 +66,7 @@ public enum Message {
 
 	SAVING_INIT,
 	INSUFFICIENT_MONEY,
+	TOP_KEYS_MAIN_INVENTORY_NAME,
 	SAVING_END,
 	CASE_PLACED_PROPERLY,
 	;
@@ -79,11 +80,11 @@ public enum Message {
 			return;
 		this.text = TextUtility.color(text);
 	}
-	public void load(){
+	public static void load(){
 		CaseOpener.getMainPlugin().saveResource("Messages.yml",false);
 		FileConfiguration config = ConfigUtility.getConfig("Messages.yml");
 		for (Message value : values()) {
-			setText(config.getString(value.name() ));
+			value.setText(config.getString(value.name() ));
 		}
 	}
 	@Override

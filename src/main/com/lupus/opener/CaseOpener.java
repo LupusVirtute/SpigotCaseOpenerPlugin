@@ -36,14 +36,6 @@ import java.io.File;
 @Dependency(value = "LuckPerms")
 @ApiVersion(value =  ApiVersion.Target.v1_15)
 
-/*@Commands({
-	@org.bukkit.plugin.java.annotation.command.Command(name = "case",desc = "admin case manager",permission = "case.admin"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "skrzynki",desc = "player case command",permission = "case.player"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "klucze",desc = "player key command",permission = "case.player"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "dajklucz",desc = "player give key command",permission = "case.player"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "kupklucz",desc = "player give key command",permission = "case.player"),
-	@org.bukkit.plugin.java.annotation.command.Command(name = "zamienklucz",desc = "player give key command",permission = "case.player"),
-})*/
 public class CaseOpener extends JavaPlugin {
 	static File dataFolder;
 	static JavaPlugin plugin;

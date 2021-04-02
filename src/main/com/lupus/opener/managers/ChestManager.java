@@ -67,7 +67,7 @@ public final class ChestManager {
 			new ChestSave(mcCases).runTaskAsynchronously(CaseOpener.getMainPlugin());
 		}
 		else{
-			new ChestSave(mcCases).runTask(CaseOpener.getMainPlugin());
+			new ChestSave(mcCases).run();
 		}
 	}
 }

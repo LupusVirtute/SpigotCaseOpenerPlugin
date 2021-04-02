@@ -23,7 +23,7 @@ public class ChestSave extends BukkitRunnable {
 		time = (System.currentTimeMillis()	- time)/1000;
 		var mrq = new MessageReplaceQuery().
 				addQuery("amount",time+"");
-		Bukkit.broadcastMessage(Message.SAVING_END.toString());
+		Bukkit.broadcastMessage(Message.SAVING_END.toString(mrq));
 
 	}
 }

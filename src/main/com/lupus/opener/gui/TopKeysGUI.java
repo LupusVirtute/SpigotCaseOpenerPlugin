@@ -1,6 +1,7 @@
 package com.lupus.opener.gui;
 
 import com.lupus.gui.Paginator;
+import com.lupus.gui.SelectableItem;
 import com.lupus.gui.TopPyramidGUI;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.gui.selectables.SelectableTop;
@@ -19,7 +20,7 @@ public class TopKeysGUI extends Paginator {
 			ItemStack chest = mcCase.getItemRepresentation(caller);
 			addItemStack(new SelectableTop(chest,mcCase,caller.getUniqueId()));
 		}
-
+		setPage(0);
 	}
 
 	@Override

@@ -216,7 +216,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 		this.officialName = officialName;
 	}
 	public String getOfficialName(){
-		return officialName;
+		return TextUtility.color(officialName);
 	}
 	public void addItem(@NotNull ItemStack item,int weight){
 		dropTable.addItem(item,weight);

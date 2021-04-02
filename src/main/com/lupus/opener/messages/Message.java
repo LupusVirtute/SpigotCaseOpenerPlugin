@@ -69,6 +69,9 @@ public enum Message {
 	TOP_KEYS_MAIN_INVENTORY_NAME,
 	SAVING_END,
 	CASE_PLACED_PROPERLY,
+	CASE_HAS_0_KEYS,
+	SELECTABLE_TOP_FILLER_NAME,
+	SELECTABLE_TOP_FILLER_LORE,
 	;
 	private static final char REPLACEMENT_CHAR = '%';
 	private String text;
@@ -82,7 +85,7 @@ public enum Message {
 	}
 	public static void load(){
 		CaseOpener.getMainPlugin().saveResource("Messages.yml",false);
-		FileConfiguration config = ConfigUtility.getConfig("Messages.yml");
+		FileConfiguration config = ConfigUtility.getConfig(CaseOpener.getMainPlugin(),"Messages.yml");
 		for (Message value : values()) {
 			value.setText(config.getString(value.name() ));
 		}

@@ -67,3 +67,8 @@ SAVING_INIT: '&6Zapisywanie skrzyń może wystąpić lag.'
 SAVING_END: '&aPoprawnie zapisano skrzynie czas: &6%amount%s'
 INSUFFICIENT_MONEY: "&4Potrzebujesz &6%price%&2$ &4by kupić tą usługe"
 TOP_KEYS_MAIN_INVENTORY_NAME: 'Topcia :3'
+CASE_HAS_0_KEYS: 'Skrzynia nie posiada żadnych kluczy'
+
+
+SELECTABLE_TOP_FILLER_NAME: 'SpaceMC'
+SELECTABLE_TOP_FILLER_LORE: '&aSpaceMC'

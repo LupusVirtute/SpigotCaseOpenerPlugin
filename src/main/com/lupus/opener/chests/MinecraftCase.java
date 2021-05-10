@@ -406,7 +406,11 @@ public class MinecraftCase implements ConfigurationSerializable {
 		serializedMap.put("price",price);
 		serializedMap.put("weight",weight);
 		serializedMap.put("icon",icon);
-		serializedMap.put("registeredCobblex",registeredCobblex);
+		List<String> stringCobblexUUID = new ArrayList<>();
+		for (UUID cobblex : registeredCobblex) {
+			stringCobblexUUID.add(cobblex.toString());
+		}
+		serializedMap.put("registeredCobblex",stringCobblexUUID);
 		serializedMap.put("cobblexLocations",cobblexLocations);
 		serializedMap.put("dropTable",dropTable);
 		List<PlayerKey> serializedPlayerKeys = new ArrayList<>();

@@ -31,23 +31,10 @@ public class InventoryListener implements Listener {
 			}
 		}
 		if (incrementer >= 9) {
-			var arr = ChestManager.getAllCases().toArray(new MinecraftCase[0]);
-			int randomEl = new Random().nextInt(arr.length);
-			inv.setResult(arr[randomEl].getCobblex());
+			inv.setResult(ChestManager.getRandomCase().getCobblex());
 		}
 	}
 	@EventHandler
 	public void onInventoryInteract(InventoryClickEvent e){
-		if (!(e.getInventory() instanceof CraftingInventory)) {
-			return;
-		}
-		if (e.getSlot() != InventoryType.SlotType.CRAFTING.ordinal()){
-			return;
-		}
-		var inv = (CraftingInventory) e.getInventory();
-		var res = inv.getResult();
-		if (MinecraftCaseUtils.getCobblex(res) != null) {
-			inv.setMatrix(new ItemStack[9]);
-		}
 	}
 }

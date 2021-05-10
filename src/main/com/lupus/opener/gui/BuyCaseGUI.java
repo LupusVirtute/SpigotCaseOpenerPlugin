@@ -3,7 +3,6 @@ package com.lupus.opener.gui;
 import com.lupus.gui.Paginator;
 import com.lupus.gui.utils.ItemUtility;
 import com.lupus.gui.utils.TextUtility;
-import com.lupus.gui.utils.nbt.InventoryUtility;
 import com.lupus.opener.CaseOpener;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.gui.selectables.SelectableCommand;
@@ -13,7 +12,11 @@ import com.lupus.opener.messages.MessageReplaceQuery;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.query.QueryMode;
+import net.luckperms.api.query.QueryOptions;
 import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +35,7 @@ public class BuyCaseGUI extends Paginator {
 		for (MinecraftCase mcCase : ChestManager.getAllCases()) {
 			ItemStack its = new ItemStack(Material.CHEST);
 			double price = mcCase.getPrice();
+
 			if (player.hasPermission("case.premium")){
 				price = getPrice(player,price);
 			}
@@ -47,7 +51,7 @@ public class BuyCaseGUI extends Paginator {
 
 			meta.setLore(lore);
 			its.setItemMeta(meta);
-			addItemStack(new SelectableCommand(its,"kupklucz "+mcCase.getName()+" 1"));
+			addItemStack(new SelectableCommand(its,"skrzynie kupklucz "+mcCase.getName()+" 1"));
 		}
 	}
 	public static double getPrice(Player p,double price){
@@ -61,13 +65,14 @@ public class BuyCaseGUI extends Paginator {
 		User user = api.getUserManager().getUser(p.getUniqueId());
 		if (user == null)
 			return price;
-		Collection<Node> nodes = user.getNodes();
+		Collection<Node> nodes = user.resolveDistinctInheritedNodes(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build());
 		for (Node node1 : nodes) {
 			if (node1.getKey().contains(node.getKey())) {
 				String key = node1.getKey().replace(node.getKey(),"").replace(".","");
 				if (NumberUtils.isNumber(key)){
-					double i = Double.parseDouble(key)/10d;
-					price *= i;
+					double i = Double.parseDouble(key)*10d;
+					double rest = (price / i);
+					price -= rest;
 				}
 			}
 		}

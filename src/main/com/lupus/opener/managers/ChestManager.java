@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Set;
 
 public final class ChestManager {
@@ -28,6 +29,21 @@ public final class ChestManager {
 			highestWeight = mcCase.getCaseWeight();
 		}
 		mcCases.put(mcCase.getName().toLowerCase(),mcCase);
+	}
+	public static MinecraftCase getRandomCase(){
+		int totalWeight = 0;
+		for (MinecraftCase mcCase : getAllCases()) {
+			totalWeight += mcCase.getCaseWeight();
+		}
+		int random = new Random().nextInt(totalWeight);
+		MinecraftCase lastCase = null;
+		for (MinecraftCase mcCase : getAllCases()) {
+			if (random < mcCase.getCaseWeight()){
+				return mcCase;
+			}
+			lastCase = mcCase;
+		}
+		return lastCase;
 	}
 	public static void addCaseLocation(Location loc,String name){
 		mcCaseLocation.put(loc,name.toLowerCase());

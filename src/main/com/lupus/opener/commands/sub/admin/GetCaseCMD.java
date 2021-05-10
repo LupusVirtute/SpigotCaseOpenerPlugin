@@ -4,7 +4,7 @@ package com.lupus.opener.commands.sub.admin;
 import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
 import com.lupus.command.framework.commands.arguments.ArgumentList;
-import com.lupus.gui.utils.nbt.InventoryUtility;
+import com.lupus.gui.utils.InventoryUtility;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.messages.Message;

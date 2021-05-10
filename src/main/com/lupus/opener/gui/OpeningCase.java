@@ -3,17 +3,19 @@ package com.lupus.opener.gui;
 
 import com.lupus.gui.GUI;
 import com.lupus.gui.utils.ItemUtility;
-import com.lupus.gui.utils.nbt.InventoryUtility;
+import com.lupus.gui.utils.InventoryUtility;
 import com.lupus.opener.managers.OpenerManager;
 import com.lupus.opener.messages.Message;
 import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -28,7 +30,6 @@ public class OpeningCase extends GUI {
 	ItemStack exit;
 	boolean playerWantsOut;
 	float winnerPercentage;
-	static Firework f;
 	/**
 	 * @param chestOfName - official name of chest
 	 * @param items - item to show
@@ -94,8 +95,7 @@ public class OpeningCase extends GUI {
 		playerWantsOut = true;
 		InventoryUtility.addItemStackToPlayerInventory(p,getWinner());
 		if (winnerPercentage < 0.01){
-			setUpFireWork(p);
-			f.detonate();
+			setUpFireWork(p.getLocation());
 			var mrq = new MessageReplaceQuery().
 					addQuery("player",p.getName()).
 					addQuery("item_name",ItemUtility.getItemName(getWinner())).
@@ -106,34 +106,19 @@ public class OpeningCase extends GUI {
 		OpenerManager.setPlayerOpener(p,null);
 		p.playSound(p.getLocation(),Sound.ENTITY_PLAYER_LEVELUP,1.0f,1.0f);
 	}
-	static void setUpFireWork(Player p){
-
-		f = (Firework) p.getWorld().spawn(p.getLocation().add(0,2,0), Firework.class);
-		FireworkMeta meta = f.getFireworkMeta();
-		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.GREEN).build());
-		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.RED).build());
-		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.AQUA).build());
-		meta.addEffect(FireworkEffect.builder().flicker(true).with(FireworkEffect.Type.BALL_LARGE).withColor(Color.YELLOW).build());
-		try {
-			Class<?> entityFireworkClass = getClass("net.minecraft.server.", "EntityFireworks");
-			Class<?> craftFireworkClass = getClass("org.bukkit.craftbukkit.", "entity.CraftFirework");
-			Object firework = craftFireworkClass.cast(f);
-			Method handle = firework.getClass().getMethod("getHandle");
-			Object entityFirework = handle.invoke(firework);
-			Field expectedLifespan = entityFireworkClass.getDeclaredField("expectedLifespan");
-			Field ticksFlown = entityFireworkClass.getDeclaredField("ticksFlown");
-			ticksFlown.setAccessible(true);
-			ticksFlown.setInt(entityFirework, expectedLifespan.getInt(entityFirework) - 1);
-			ticksFlown.setAccessible(false);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-	static Class<?> getClass(String prefix, String nmsClassString) throws ClassNotFoundException {
-		String version = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3] + ".";
-		String name = prefix + version + nmsClassString;
-		Class<?> nmsClass = Class.forName(name);
-		return nmsClass;
+	static void setUpFireWork(Location loc){
+		loc.add(0,2,0);
+		FireworkEffect effect = FireworkEffect.builder().
+				flicker(true).
+				trail(true).
+				with(FireworkEffect.Type.BALL_LARGE).
+				withColor(Color.AQUA,Color.GREEN).
+				build();
+		Firework firework = (Firework)loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
+		FireworkMeta meta = firework.getFireworkMeta();
+		meta.addEffect(effect);
+		firework.setFireworkMeta(meta);
+		firework.setVelocity(new Vector(0.1,10,0));
 	}
 	public ItemStack getWinner(){
 		return items[winnerIndex];

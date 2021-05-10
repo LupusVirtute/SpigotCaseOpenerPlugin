@@ -12,7 +12,8 @@ import org.bukkit.entity.Player;
 public class ChangeKeyCMD extends PlayerCommand {
 	static CommandMeta meta = new CommandMeta().
 			setName("zamienklucz").
-			setUsage(usage("/zamienklucz","[zskrzyni] [naskrzynie] [ilosc]")).setDescription(colorText("&6&l"))
+			setUsage(usage("/skrzynie zamienklucz","[zskrzyni] [naskrzynie] [ilosc]")).
+			setDescription(colorText("&6&lNarazie brak spisu ile na jaka skrzynie trzeba"))
 			.setArgumentAmount(3);
 	public ChangeKeyCMD() {
 		super(meta);
@@ -29,7 +30,7 @@ public class ChangeKeyCMD extends PlayerCommand {
 		if (mcCase == null){
 			var mrq = new MessageReplaceQuery().
 					addQuery("chest",chestFromName);
-			player.sendMessage(Message.CASE_GIVEN_DONT_EXISTS.toString());
+			player.sendMessage(Message.CASE_GIVEN_DONT_EXISTS.toString(mrq));
 			return;
 		}
 		MinecraftCase forCase = ChestManager.getCase(chestToName);
@@ -47,7 +48,7 @@ public class ChangeKeyCMD extends PlayerCommand {
 		if (neededAmount > mcCase.getKeyAmount(player)){
 			var mrq = new MessageReplaceQuery().
 					addQuery("amount",neededAmount+"");
-			player.sendMessage(Message.COMMAND_CHANGE_KEY_NEED.toString());
+			player.sendMessage(Message.COMMAND_CHANGE_KEY_NEED.toString(mrq));
 			return;
 		}
 		mcCase.removeKey(player,neededAmount);

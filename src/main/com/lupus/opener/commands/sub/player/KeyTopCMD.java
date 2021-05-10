@@ -4,12 +4,12 @@ import com.lupus.command.framework.commands.CommandMeta;
 import com.lupus.command.framework.commands.PlayerCommand;
 import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.gui.TopKeysGUI;
-import com.lupus.opener.messages.Message;
 import org.bukkit.entity.Player;
 
 public class KeyTopCMD extends PlayerCommand {
 	static CommandMeta meta = new CommandMeta().
 			setName("kluczetop").
+			setUsage(usage("/skrzynie kluczetop")).
 			setDescription("&aPokazuje top kluczy");
 	public KeyTopCMD(){
 		super(meta);

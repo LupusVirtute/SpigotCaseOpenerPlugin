@@ -5,11 +5,10 @@ import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.CaseOpener;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 public enum Message {
+	LOGO,
 	DESTROY_MESSAGE_ON,
 	DESTROY_MESSAGE_OFF,
 	CASE_EXISTS,
@@ -30,6 +29,9 @@ public enum Message {
 	COMMAND_KEYS_TOP,
 	COMMAND_KEYS_BOTTOM,
 	COMMAND_KEYS_KEY,
+
+	COMMAND_KEYS_RESET,
+
 
 	QUANTITY_MORE_THAN_ZERO,
 	NOT_ENOUGH_KEYS,
@@ -70,9 +72,20 @@ public enum Message {
 	SAVING_END,
 	CASE_PLACED_PROPERLY,
 	CASE_HAS_0_KEYS,
+	CASE_IS_CALCULATING_TOP,
 	SELECTABLE_TOP_FILLER_NAME,
 	SELECTABLE_TOP_FILLER_LORE,
-	;
+	UNKNOWN_NICKNAME,
+	CASE_BREAKED,
+	PLAYER_CASE_KEY_FORMAT,
+	PLAYER_PLACE_TEMPLATE,
+	ITEM_KEY_FORMAT_TEMPLATE,
+	ITEM_KEY_LORE_TEMPLATE,
+	COMMAND_KEYS_RESET_PLAYER,
+	COBBLEX_TITLE,
+	COBBLEX_LORE,
+
+	ICON_SET;
 	private static final char REPLACEMENT_CHAR = '%';
 	private String text;
 	Message(){
@@ -81,20 +94,22 @@ public enum Message {
 	private void setText(String text){
 		if (text == null)
 			return;
-		this.text = TextUtility.color(text);
+		text = TextUtility.color(text);
+		this.text = text.replace("\\n","\n");
 	}
 	public static void load(){
 		CaseOpener.getMainPlugin().saveResource("Messages.yml",false);
 		FileConfiguration config = ConfigUtility.getConfig(CaseOpener.getMainPlugin(),"Messages.yml");
 		for (Message value : values()) {
-			value.setText(config.getString(value.name() ));
+			value.setText(config.getString(value.name()));
 		}
 	}
 	@Override
 	public String toString(){
-		return text.replace("\\n","\n");
+		return text;
 	}
 	public String toString(MessageReplaceQuery query){
+
 		return toString(query.toMap());
 	}
 	public String toString(Map<String,String> replacementMap){
@@ -105,9 +120,12 @@ public enum Message {
 					append(replacementEntry.getKey()).
 					append(REPLACEMENT_CHAR).
 					toString();
-			copiedText = copiedText.replace(key, replacementEntry.getValue());
+			String value = replacementEntry.getValue();
+			if (value == null)
+				value = "";
+			copiedText = copiedText.replace(key, value);
 		}
-		return copiedText.replace("\\n","\n");
+		return copiedText;
 
 	}
 }

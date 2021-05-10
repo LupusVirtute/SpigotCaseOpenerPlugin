@@ -1,19 +1,23 @@
 package com.lupus.opener.listeners;
 
 import com.lupus.gui.utils.NBTUtility;
-import com.lupus.gui.utils.TextUtility;
 import com.lupus.opener.chests.MinecraftCase;
+import com.lupus.opener.chests.utils.MinecraftCaseUtils;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.messages.Message;
-import org.bukkit.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockManipulationListener implements Listener {
@@ -25,6 +29,14 @@ public class BlockManipulationListener implements Listener {
 			return;
 		}
 		Block block = e.getBlock();
+		if (block.getType() == Material.MOSSY_COBBLESTONE){
+			for (MinecraftCase mcCase : ChestManager.getAllCases()) {
+				if (mcCase.breakCobblex(e.getPlayer(),block.getLocation())) {
+					e.setDropItems(false);
+					return;
+				}
+			}
+		}
 		if (block == null) {
 			return;
 		}
@@ -34,13 +46,25 @@ public class BlockManipulationListener implements Listener {
 		if (isTimeForDestroy){
 			boolean b = ChestManager.removeCaseLocation(block);
 			if (b)
-				p.sendMessage(TextUtility.color("&a&lUsunięto bez problemu lokacje skrzyni"));
+				p.sendMessage(Message.CASE_BREAKED.toString());
 		}
 	}
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e){
+		if (e.getHand() == EquipmentSlot.HAND) {
+			if (e.getItem() != null){
+				var mcCase = MinecraftCaseUtils.getKeyRedeemCase(e.getItem());
+				if (mcCase == null)
+					return;
+				int b = mcCase.redeemKey(e.getPlayer(),e.getItem());
+				if (b > -4)
+					e.setCancelled(true);
+				if (b == -3)
+					Bukkit.broadcast(e.getPlayer().getName()+" - Prawdopodobne Kopiowanie kluczy","case.moderator");
+			}
+		}
 		if (e.hasBlock()) {
-			Player p = e.getPlayer().getPlayer();
+			Player p = e.getPlayer();
 			if (p == null) {
 				return;
 			}
@@ -59,12 +83,22 @@ public class BlockManipulationListener implements Listener {
 		}
 	}
 	@EventHandler
+	public void onBlockCraft(CraftItemEvent e){
+		e.getInventory().setMatrix(new ItemStack[9]);
+
+	}
+	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e){
 		if (e == null)
 			return;
+		ItemStack item = e.getItemInHand();
+		if (item.getType() == Material.MOSSY_COBBLESTONE){
+			var mcCase = MinecraftCaseUtils.getCobblex(item);
+			if (mcCase != null)
+				mcCase.putDownCobblex(item,e.getBlockPlaced().getLocation());
+		}
 		if (!e.getPlayer().hasPermission("case.admin.place"))
 			return;
-		ItemStack item = e.getItemInHand();
 		String data;
 		data = NBTUtility.getNBTValue(item,"case",String.class);
 		if (data == null) {

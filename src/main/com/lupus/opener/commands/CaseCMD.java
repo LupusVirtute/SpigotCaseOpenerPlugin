@@ -26,6 +26,9 @@ public class CaseCMD extends SupCommand {
 						new EditWeightCMD(),
 						new ReloadAllCMD(),
 						new SetStatTrackCommand(),
+						new ResetAccountCMD(),
+						new SetIconCMD(),
+						new GetCobblexCMD(),
 				});
 	}
 }

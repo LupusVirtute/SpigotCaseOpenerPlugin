@@ -22,7 +22,7 @@ public class CaseItemList extends Paginator {
 	CaseItemHolder dropItems;
 	MinecraftCase mcCase;
 	public CaseItemList(MinecraftCase minecraftCase,Player player){
-		super(minecraftCase.getName());
+		super(minecraftCase.getOfficialName());
 		mcCase = minecraftCase;
 		this.dropItems = minecraftCase.getDropTable();
 		int n=0;
@@ -48,7 +48,7 @@ public class CaseItemList extends Paginator {
 			meta.setLore(lore);
 			item.setItemMeta(meta);
 
-			ItemEditor itemEditor = new ItemEditor(minecraftCase.getName(), n, mcCase);
+			ItemEditor itemEditor = new ItemEditor(minecraftCase.getOfficialName(), n, mcCase);
 
 			this.addItemStack(new SelectableItemEditor(item,itemEditor,player));
 			n++;

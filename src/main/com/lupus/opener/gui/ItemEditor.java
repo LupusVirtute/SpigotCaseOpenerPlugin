@@ -4,7 +4,7 @@ import com.lupus.gui.GUI;
 import com.lupus.gui.utils.ItemUtility;
 import com.lupus.gui.utils.SkullUtility;
 import com.lupus.gui.utils.TextUtility;
-import com.lupus.gui.utils.nbt.InventoryUtility;
+import com.lupus.gui.utils.InventoryUtility;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.messages.Message;
@@ -65,9 +65,9 @@ public class ItemEditor extends GUI {
 
 		meta = info.getItemMeta();
 		meta.setDisplayName(Message.ITEM_EDITOR_INFO_NAME.toString());
-		updateInfoMeta();
 		info.setItemMeta(meta);
 		inv.setItem(13,info);
+		updateInfoMeta();
 
 	}
 	static DecimalFormat format = new DecimalFormat("#.#####");

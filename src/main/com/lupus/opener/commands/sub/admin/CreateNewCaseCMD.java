@@ -19,7 +19,7 @@ public class CreateNewCaseCMD extends PlayerCommand {
 			setUsage(usage("/case create","[name] [officialName] [price] [weight]")).
 			setDescription(colorText("&9Tworzy nową skrzynie\n" +
 					"&c[name] &5- &9Nazwa Skrzyni\n" +
-					"&c[officialName] &5- &9Nazwa &4&LKTÓRĄ KOLORUJESZ KURWA\n" +
+					"&c[officialName] &5- &9Nazwa &4&LKtóra jest pokolorowana\n" +
 					"&c[price] &5- &9Cena skrzyni\n" +
 					"&c[weight] &5- &9Waga skrzyni to jest jak ważna jest\n")).
 			setArgumentAmount(4);
@@ -31,7 +31,7 @@ public class CreateNewCaseCMD extends PlayerCommand {
 	public void run(Player executor, ArgumentList args) throws Exception {
 		String chest = args.getArg(String.class,0);
 		String chestName = args.getArg(String.class,1);
-		Float price = args.getArg(float.class,2);
+		float price = args.getArg(double.class,2).floatValue();
 		Integer weight = args.getArg(int.class,3);
 
 

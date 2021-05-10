@@ -1,19 +1,29 @@
 package com.lupus.opener;
 
+import com.lupus.command.framework.commands.arguments.ArgumentType;
+import com.lupus.gui.utils.ItemUtility;
+import com.lupus.gui.utils.NBTUtility;
 import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.CaseItemHolder;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.chests.PlayerKey;
 import com.lupus.opener.listeners.BlockManipulationListener;
+import com.lupus.opener.listeners.InventoryListener;
 import com.lupus.opener.listeners.PvEListener;
 import com.lupus.opener.managers.ChestManager;
 import com.lupus.opener.messages.Message;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
@@ -24,6 +34,7 @@ import org.bukkit.plugin.java.annotation.plugin.Website;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Plugin(name="LupusCaseOpener", version="1.0-SNAPSHOT")
 @Description(value = "Simple case opener")
@@ -45,6 +56,8 @@ public class CaseOpener extends JavaPlugin {
 		return dataFolder;
 	}
 	public static LuckPerms getLuckPermsAPI(){
+		if (api == null)
+			api = LuckPermsProvider.get();
 		return api;
 	}
 
@@ -81,12 +94,16 @@ public class CaseOpener extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new BlockManipulationListener(),plugin);
 		getServer().getPluginManager().registerEvents(new PvEListener(),plugin);
+		getServer().getPluginManager().registerEvents(new InventoryListener(),plugin);
 
 		info("Started Loading Chests");
 		loadChests();
 		info("Chests loaded");
 		info("amount:"+ChestManager.getAll().size());
-
+		ArgumentType.addArgumentTypeInterpreter(new ArgumentType(MinecraftCase.class,(arg)-> ChestManager.getCase(arg[0])));
+	}
+	public static NamespacedKey NamespacedKey(String key){
+		return new NamespacedKey(getMainPlugin(),key);
 	}
 	public static void info(String info){
 		Bukkit.getLogger().info(info);
@@ -104,9 +121,15 @@ public class CaseOpener extends JavaPlugin {
 			return;
 		for (File chestFile : chestFiles) {
 			FileConfiguration file = YamlConfiguration.loadConfiguration(chestFile);
-			MinecraftCase minecraftCase = (MinecraftCase)file.get("Chest");
-			ChestManager.addCase(minecraftCase);
+			MinecraftCase minecraftCase = (MinecraftCase) file.get("Chest");
+
+			if (minecraftCase != null) {
+				ChestManager.addCase(minecraftCase);
+				minecraftCase.forceTopUpdate(true);
+			}
+
 		}
+
 	}
 	private void loadSerializedClasses() {
 		ConfigurationSerialization.registerClass(MinecraftCase.class);
@@ -131,25 +154,4 @@ public class CaseOpener extends JavaPlugin {
 			api = provider.getProvider();
 		}
 	}
-/*
-	public ILupusCommand[] lupusCommands = {
-		new CaseCMD(),
-		new PlayerSupCommand(),
-		new KeyTransactionCMD(),
-		new KeysCMD(),
-		new BuyKeyCMD(),
-		new ChangeKeyCMD(),
-	};
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		String cmd = command.getName().toLowerCase();
-		for (ILupusCommand lupusCommand : lupusCommands) {
-			if (lupusCommand.isMatch(cmd)) {
-				lupusCommand.execute(sender, args);
-				break;
-			}
-		}
-		return super.onCommand(sender, command, label, args);
-	}
-	*/
 }

@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 public class KeysCMD extends PlayerCommand {
 	static CommandMeta meta = new CommandMeta().
 			setName("klucze").
-			setUsage(usage("/klucze")).
+			setUsage(usage("/skrzynie klucze")).
 			setDescription("Pokazuje ilość kluczy").
 			setArgumentAmount(0);
 
@@ -26,8 +26,9 @@ public class KeysCMD extends PlayerCommand {
 		MinecraftKey[] keys = ChestManager.getKeysForPlayer(player);
 		player.sendMessage(Message.COMMAND_KEYS_TOP.toString());
 		for (MinecraftKey key : keys) {
+			String name = ChestManager.getCase(key.chest).getOfficialName();
 			var mrq = new MessageReplaceQuery().
-					addQuery("chest", key.chest).
+					addQuery("chest", name).
 					addQuery("amount", key.amount+"");
 			player.sendMessage(Message.COMMAND_KEYS_KEY.toString(mrq));
 		}

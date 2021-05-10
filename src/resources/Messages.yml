@@ -1,3 +1,4 @@
+
 DESTROY_MESSAGE_ON: "&4Włączono niszczenie lokacji skrzyń"
 DESTROY_MESSAGE_OFF: "&4Wyłączono niszczenie lokacji skrzyń"
 CASE_EXISTS: "&4&lSkrzynia istnieje"
@@ -72,3 +73,17 @@ CASE_HAS_0_KEYS: 'Skrzynia nie posiada żadnych kluczy'
 
 SELECTABLE_TOP_FILLER_NAME: 'SpaceMC'
 SELECTABLE_TOP_FILLER_LORE: '&aSpaceMC'
+UNKNOWN_NICKNAME: 'Nieznany Nick'
+CASE_BREAKED: "&a&lUsunięto bez problemu lokacje skrzyni"
+PLAYER_CASE_KEY_FORMAT: 'Klucze : %amount%'
+CASE_IS_CALCULATING_TOP: 'Obliczanie topki proszę poczekać'
+PLAYER_PLACE_TEMPLATE: '%place% . %name%'
+ITEM_KEY_FORMAT_TEMPLATE: 'Klucz %amount% > %case%'
+ITEM_KEY_LORE_TEMPLATE: |-
+    %amount%
+    %case%
+COMMAND_KEYS_RESET: '&4Zresetowano ilość kluczy graczowi &c%player%'
+COMMAND_KEYS_RESET_PLAYER: '&4Administrator &c%player% &4wyrzucił wszystkie twoje klucze'
+COBBLEX_TITLE: '&aCobblex'
+COBBLEX_LORE: '&6Cobblex postaw i rozwal by ogarnąć co dropnie :D'
+ICON_SET: 'Nowa ikona skrzyni ustawiona'

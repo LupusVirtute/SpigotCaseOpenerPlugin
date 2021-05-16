@@ -16,7 +16,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -54,13 +57,13 @@ public class BlockManipulationListener implements Listener {
 		if (e.getHand() == EquipmentSlot.HAND) {
 			if (e.getItem() != null){
 				var mcCase = MinecraftCaseUtils.getKeyRedeemCase(e.getItem());
-				if (mcCase == null)
-					return;
-				int b = mcCase.redeemKey(e.getPlayer(),e.getItem());
-				if (b > -4)
-					e.setCancelled(true);
-				if (b == -3)
-					Bukkit.broadcast(e.getPlayer().getName()+" - Prawdopodobne Kopiowanie kluczy","case.moderator");
+				if (mcCase != null) {
+					int b = mcCase.redeemKey(e.getPlayer(), e.getItem());
+					if (b > -4)
+						e.setCancelled(true);
+					if (b == -3)
+						Bukkit.broadcast(e.getPlayer().getName() + " - Prawdopodobne Kopiowanie kluczy", "case.moderator");
+				}
 			}
 		}
 		if (e.hasBlock()) {
@@ -83,11 +86,6 @@ public class BlockManipulationListener implements Listener {
 		}
 	}
 	@EventHandler
-	public void onBlockCraft(CraftItemEvent e){
-		e.getInventory().setMatrix(new ItemStack[9]);
-
-	}
-	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e){
 		if (e == null)
 			return;
@@ -106,7 +104,7 @@ public class BlockManipulationListener implements Listener {
 		}
 		MinecraftCase mcCase = ChestManager.getCase(data);
 		if (mcCase != null){
-			mcCase.addChestLocation(e.getBlockPlaced().getLocation());
+			mcCase.addChestLocation(e.getBlockPlaced().getLocation().clone());
 			e.getPlayer().sendMessage(Message.CASE_PLACED_PROPERLY.toString());
 		}
 	}

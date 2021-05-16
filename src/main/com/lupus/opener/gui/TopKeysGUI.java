@@ -10,15 +10,16 @@ import com.lupus.opener.messages.Message;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class TopKeysGUI extends Paginator {
+	public static List<SelectableTop> selectableTops = new ArrayList<>();
 	public TopKeysGUI(Player caller) {
 		super(Message.TOP_KEYS_MAIN_INVENTORY_NAME.toString());
-		Collection<MinecraftCase> set = ChestManager.getAllCases();
-		for (MinecraftCase mcCase : set) {
-			ItemStack chest = mcCase.getItemRepresentation(caller);
-			addItemStack(new SelectableTop(chest,mcCase,caller.getUniqueId()));
+		for (SelectableTop item : selectableTops) {
+			addItemStack(item);
 		}
 		setPage(0);
 	}

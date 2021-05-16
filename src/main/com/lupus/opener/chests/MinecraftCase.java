@@ -59,7 +59,11 @@ public class MinecraftCase implements ConfigurationSerializable {
 				cobblexLocations = (List<Location>) map.get("cobblexLocations");
 			}
 			if (map.containsKey("registeredCobblex")){
-				registeredCobblex = (List<UUID>) map.get("registeredCobblex");
+				var tempStringList =  (List<String>) map.get("registeredCobblex");
+				registeredCobblex = new ArrayList<>();
+				for (String s : tempStringList) {
+					registeredCobblex.add(UUID.fromString(s));
+				}
 			}
 			if(map.containsKey("dropTable")){
 				dropTable = (CaseItemHolder)map.get("dropTable");
@@ -103,8 +107,8 @@ public class MinecraftCase implements ConfigurationSerializable {
 					if (chests == null)
 						chests = new ArrayList<>();
 					for (int i=0;i<chests.size() ;i++ ) {
-							ChestManager.addCaseLocation(chests.get(i),name);
-						}
+						ChestManager.addCaseLocation(chests.get(i),name);
+					}
 				}
 			}else{
 				chests = new ArrayList<>();
@@ -156,6 +160,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 			return;
 		}
 		removeKey(player,1);
+		forceOpen(player);
 	}
 	public void forceOpen(Player player){
 		var opener = OpenerManager.getPlayerOpeningCase(player);
@@ -342,14 +347,16 @@ public class MinecraftCase implements ConfigurationSerializable {
 
 		String[] playerMessages = Message.CHEST_LIST_PLAYER_LORE.toString(mrq).split("\\n");
 		List<String> lore = new ArrayList<>(Arrays.asList(playerMessages));
-
-
+		if (caller != null)
+			addAdminInfo(caller,mrq,lore);
+		ItemUtility.setItemLore(chest,lore);
+		return chest;
+	}
+	private void addAdminInfo(Player caller,MessageReplaceQuery mrq,List<String> lore){
 		if (caller.hasPermission("case.admin")){
 			String[] adminMessages = Message.CHEST_LIST_ADMIN_LORE.toString(mrq).split("\\n");
 			lore.addAll(Arrays.asList(adminMessages));
 		}
-		ItemUtility.setItemLore(chest,lore);
-		return chest;
 	}
 	public void setIcon(ItemStack itemStack){
 		if (itemStack == null)
@@ -453,7 +460,7 @@ public class MinecraftCase implements ConfigurationSerializable {
 		try {
 			config.save(chestFile);
 		}catch(Exception ex){
-			Bukkit.getLogger().info(ex.toString());
+			ex.printStackTrace();
 		}
 	}
 

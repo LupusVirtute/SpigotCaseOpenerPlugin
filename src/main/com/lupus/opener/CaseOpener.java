@@ -7,6 +7,8 @@ import com.lupus.opener.chests.CaseItem;
 import com.lupus.opener.chests.CaseItemHolder;
 import com.lupus.opener.chests.MinecraftCase;
 import com.lupus.opener.chests.PlayerKey;
+import com.lupus.opener.gui.TopKeysGUI;
+import com.lupus.opener.gui.selectables.SelectableTop;
 import com.lupus.opener.listeners.BlockManipulationListener;
 import com.lupus.opener.listeners.InventoryListener;
 import com.lupus.opener.listeners.PvEListener;
@@ -125,7 +127,10 @@ public class CaseOpener extends JavaPlugin {
 
 			if (minecraftCase != null) {
 				ChestManager.addCase(minecraftCase);
-				minecraftCase.forceTopUpdate(true);
+				minecraftCase.forceTopUpdate(false);
+				ItemStack chest = minecraftCase.getItemRepresentation(null);
+				var sT = new SelectableTop(chest,minecraftCase,null);
+				TopKeysGUI.selectableTops.add(sT);
 			}
 
 		}

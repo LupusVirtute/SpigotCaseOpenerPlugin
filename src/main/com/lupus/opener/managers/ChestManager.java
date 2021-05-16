@@ -35,15 +35,19 @@ public final class ChestManager {
 		for (MinecraftCase mcCase : getAllCases()) {
 			totalWeight += mcCase.getCaseWeight();
 		}
-		int random = new Random().nextInt(totalWeight);
-		MinecraftCase lastCase = null;
+		MinecraftCase leastWeight = null;
+		var rnd = new Random();
 		for (MinecraftCase mcCase : getAllCases()) {
+			int random = rnd.nextInt(totalWeight/mcCase.getCaseWeight());
 			if (random < mcCase.getCaseWeight()){
 				return mcCase;
 			}
-			lastCase = mcCase;
+			if (leastWeight == null)
+				leastWeight = mcCase;
+			else if (leastWeight.getCaseWeight() > mcCase.getCaseWeight())
+				leastWeight = mcCase;
 		}
-		return lastCase;
+		return leastWeight;
 	}
 	public static void addCaseLocation(Location loc,String name){
 		mcCaseLocation.put(loc,name.toLowerCase());

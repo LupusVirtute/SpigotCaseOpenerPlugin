@@ -31,15 +31,17 @@ public final class ChestManager {
 		mcCases.put(mcCase.getName().toLowerCase(),mcCase);
 	}
 	public static MinecraftCase getRandomCase(){
-		int totalWeight = 0;
+		int highestWeight = 0;
 		for (MinecraftCase mcCase : getAllCases()) {
-			totalWeight += mcCase.getCaseWeight();
+			if (highestWeight < mcCase.getCaseWeight())
+				highestWeight = mcCase.getCaseWeight();
 		}
+		highestWeight /= 100;
 		MinecraftCase leastWeight = null;
 		var rnd = new Random();
 		for (MinecraftCase mcCase : getAllCases()) {
-			int random = rnd.nextInt(totalWeight/mcCase.getCaseWeight());
-			if (random < mcCase.getCaseWeight()){
+			int random = rnd.nextInt(mcCase.getCaseWeight())+highestWeight;
+			if (random > mcCase.getCaseWeight()){
 				return mcCase;
 			}
 			if (leastWeight == null)

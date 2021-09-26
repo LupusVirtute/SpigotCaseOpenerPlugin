@@ -2,6 +2,7 @@ package com.lupus.opener.commands.sub.admin;
 
 
 import com.lupus.command.framework.commands.CommandMeta;
+import com.lupus.command.framework.commands.LupusCommand;
 import com.lupus.command.framework.commands.PlayerCommand;
 import com.lupus.command.framework.commands.arguments.ArgumentList;
 import com.lupus.opener.CaseOpener;
@@ -11,12 +12,13 @@ import com.lupus.opener.messages.Message;
 import com.lupus.opener.messages.MessageReplaceQuery;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.UUID;
 
-public class GiveKeyCMD extends PlayerCommand {
+public class GiveKeyCMD extends LupusCommand {
 	static CommandMeta meta = new CommandMeta().
 			setName("givekey").
 			setUsage(usage("/case givekey","[case] [name] [ilosc]")).
@@ -28,7 +30,7 @@ public class GiveKeyCMD extends PlayerCommand {
 	}
 
 	@Override
-	public void run(Player executor, ArgumentList args) throws Exception {
+	public void run(CommandSender executor, ArgumentList args) throws Exception {
 		String chest = args.getArg(String.class,0);
 		String playerName = args.getArg(String.class,1);
 		Integer amount = args.getArg(int.class,2);
@@ -75,7 +77,7 @@ public class GiveKeyCMD extends PlayerCommand {
 		mrq.addQuery("player", playerName);
 		executor.sendMessage(Message.COMMAND_GIVE_KEY_SUCCESS_MESSAGE_ADMIN.toString(mrq));
 	}
-	private void giveAllCasesTo(Player executor, ArgumentList args){
+	private void giveAllCasesTo(CommandSender executor, ArgumentList args){
 		for(MinecraftCase theCase : ChestManager.getAllCases()){
 			String chest = theCase.getName();
 			String[] argsBetter = Arrays.copyOf(args.toArray(new String[0]),args.size());
@@ -83,7 +85,7 @@ public class GiveKeyCMD extends PlayerCommand {
 			this.executeAsync(executor,argsBetter, CaseOpener.getMainPlugin());
 		}
 	}
-	private void giveCaseToAll(Player executor, ArgumentList args){
+	private void giveCaseToAll(CommandSender executor, ArgumentList args){
 		for(Player p : Bukkit.getOnlinePlayers()){
 			String playerName = p.getName();
 			String[] argsBetter = Arrays.copyOf(args.toArray(new String[0]),args.size());

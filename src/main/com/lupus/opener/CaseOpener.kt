@@ -1,162 +1,210 @@
-package com.lupus.opener;
+package com.lupus.opener
 
-import com.lupus.command.framework.commands.arguments.ArgumentType;
-import com.lupus.gui.utils.ItemUtility;
-import com.lupus.gui.utils.NBTUtility;
-import com.lupus.opener.chests.CaseItem;
-import com.lupus.opener.chests.CaseItemHolder;
-import com.lupus.opener.chests.MinecraftCase;
-import com.lupus.opener.chests.PlayerKey;
-import com.lupus.opener.gui.TopKeysGUI;
-import com.lupus.opener.gui.selectables.SelectableTop;
-import com.lupus.opener.listeners.BlockManipulationListener;
-import com.lupus.opener.listeners.InventoryListener;
-import com.lupus.opener.listeners.PvEListener;
-import com.lupus.opener.managers.ChestManager;
-import com.lupus.opener.messages.Message;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.annotation.dependency.Dependency;
-import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
-import org.bukkit.plugin.java.annotation.plugin.Description;
-import org.bukkit.plugin.java.annotation.plugin.Plugin;
-import org.bukkit.plugin.java.annotation.plugin.Website;
-import org.bukkit.plugin.java.annotation.plugin.author.Author;
+import com.lupus.gui.TopPyramidGUI
+import com.lupus.opener.chests.MinecraftCase
+import java.util.UUID
+import com.lupus.gui.SelectableItem
+import com.lupus.gui.IGUI
+import com.lupus.gui.utils.SkullUtility
+import com.lupus.gui.utils.ItemUtility
+import java.util.Arrays
+import com.lupus.opener.gui.top.GUITopCase
+import com.lupus.gui.utils.TextUtility
+import com.lupus.gui.PlayerSelectableItem
+import com.lupus.opener.gui.ItemEditor
+import com.lupus.gui.Paginator
+import java.text.DecimalFormat
+import com.lupus.opener.managers.ChestManager
+import com.lupus.opener.gui.selectables.SelectableCase
+import net.luckperms.api.LuckPerms
+import com.lupus.opener.CaseOpener
+import net.luckperms.api.query.QueryOptions
+import net.luckperms.api.query.QueryMode
+import com.lupus.opener.gui.BuyCaseGUI
+import com.lupus.opener.gui.selectables.SelectableCommand
+import com.lupus.gui.GUI
+import com.lupus.opener.gui.BuyKeysCMD
+import com.lupus.gui.utils.InventoryUtility
+import com.lupus.opener.chests.CaseItem
+import com.lupus.opener.gui.selectables.SelectableTop
+import com.lupus.opener.gui.TopKeysGUI
+import com.lupus.opener.gui.OpeningCase
+import com.lupus.opener.managers.OpenerManager
+import com.lupus.opener.chests.CaseItemHolder
+import com.lupus.opener.gui.selectables.SelectableItemEditor
+import com.lupus.opener.chests.utils.MinecraftCaseUtils
+import com.lupus.gui.utils.NBTUtility
+import java.util.HashMap
+import java.util.TreeMap
+import com.lupus.opener.chests.PlayerKey
+import com.lupus.opener.gui.CaseItemList
+import com.lupus.opener.runnables.ChestOpener
+import java.lang.StringBuilder
+import java.util.LinkedList
+import java.lang.Runnable
+import com.lupus.command.framework.commands.PlayerCommand
+import com.lupus.opener.commands.sub.admin.GetCaseCMD
+import kotlin.Throws
+import com.lupus.command.framework.commands.LupusCommand
+import com.lupus.command.framework.commands.CommandMeta
+import com.lupus.opener.commands.sub.admin.GiveKeyCMD
+import com.lupus.opener.commands.sub.admin.SetIconCMD
+import com.lupus.opener.commands.sub.admin.OpenCaseCMD
+import com.lupus.opener.commands.sub.admin.ReloadAllCMD
+import com.lupus.opener.commands.sub.admin.RemoveKeyCMD
+import com.lupus.opener.commands.sub.admin.SaveCasesCMD
+import com.lupus.opener.commands.sub.admin.EditWeightCMD
+import com.lupus.opener.commands.sub.admin.GetCobblexCMD
+import com.lupus.opener.commands.sub.admin.OpenEditorCMD
+import com.lupus.opener.gui.ChestList
+import com.lupus.opener.commands.sub.admin.ResetAccountCMD
+import com.lupus.opener.commands.sub.admin.CreateNewCaseCMD
+import com.lupus.opener.commands.sub.admin.AllowDestructionCMD
+import com.lupus.opener.listeners.BlockManipulationListener
+import com.lupus.opener.commands.sub.admin.SetStatTrackCommand
+import com.lupus.opener.commands.sub.player.KeysCMD
+import com.lupus.opener.chests.MinecraftKey
+import com.lupus.opener.commands.sub.player.BuyKeyCMD
+import com.lupus.opener.commands.sub.player.KeyTopCMD
+import com.lupus.opener.commands.sub.player.ChangeKeyCMD
+import com.lupus.opener.commands.sub.player.RandomCaseDaily
+import java.time.Instant
+import com.lupus.opener.commands.sub.player.GetCraftedCobblex
+import com.lupus.opener.commands.sub.player.KeyTransactionCMD
+import com.lupus.command.framework.commands.arguments.UInteger
+import com.lupus.opener.commands.sub.player.WithdrawKeyCommand
+import java.lang.IllegalArgumentException
+import java.util.HashSet
+import com.lupus.command.framework.commands.SupCommand
+import com.lupus.command.framework.commands.PlayerSupCommand
+import com.lupus.opener.commands.PlayerCaseCommand
+import com.lupus.opener.runnables.ChestSave
+import com.lupus.gui.utils.ConfigUtility
+import org.bukkit.plugin.java.annotation.plugin.author.Author
+import org.bukkit.plugin.java.annotation.plugin.Website
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion
+import com.lupus.opener.listeners.PvEListener
+import com.lupus.opener.listeners.InventoryListener
+import com.lupus.command.framework.commands.arguments.ArgumentRunner
+import com.lupus.command.framework.commands.arguments.ArgumentType
+import com.lupus.opener.messages.Message
+import net.milkbowl.vault.economy.Economy
+import net.luckperms.api.LuckPermsProvider
+import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.configuration.serialization.ConfigurationSerialization
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.plugin.java.annotation.dependency.Dependency
+import org.bukkit.plugin.java.annotation.dependency.DependsOn
+import org.bukkit.plugin.java.annotation.plugin.Description
+import org.bukkit.plugin.java.annotation.plugin.Plugin
+import java.io.File
 
-import java.io.File;
-import java.util.Arrays;
-
-@Plugin(name="LupusCaseOpener", version="1.0-SNAPSHOT")
+@Plugin(name = "LupusCaseOpener", version = "1.0-SNAPSHOT")
 @Description(value = "Simple case opener")
 @Author(value = "LupusVirtute")
 @Website(value = "github.com/PuccyDestroyerxXx")
+@ApiVersion(value = ApiVersion.Target.v1_15)
+class CaseOpener : JavaPlugin() {
+    override fun onEnable() {
+        info("Loading CaseOpener")
+        mainPlugin = this
+        mainDataFolder = dataFolder
+        info("Hooking into vault")
+        if (!setupEconomy()) {
+            logger.severe(String.format("[%s] - Disabled due to no Vault dependency found!", description.name))
+            server.pluginManager.disablePlugin(this)
+            return
+        }
+        info("Hooked into Vault successfully")
+        info("Setting up luck perms")
+        setupLuckPerms()
+        info("Luck Perms API set up")
+        info("Loading serialized classes")
+        loadSerializedClasses()
+        info("Serialized classes loaded")
+        info("Loading messages")
+        Message.Companion.load()
+        info("All messages loaded!")
+        server.pluginManager.registerEvents(BlockManipulationListener(), mainPlugin as CaseOpener)
+        server.pluginManager.registerEvents(PvEListener(), mainPlugin as CaseOpener)
+        server.pluginManager.registerEvents(InventoryListener(), mainPlugin as CaseOpener)
+        info("Started Loading Chests")
+        loadChests()
+        info("Chests loaded")
+        info("amount:" + ChestManager.allCases.size)
+        ArgumentType.addArgumentTypeInterpreter(ArgumentType(
+            MinecraftCase::class.java) { arg: Array<String?> -> ChestManager.getCase(arg[0]) })
+    }
 
-@Dependency(value = "Vault")
-@Dependency(value = "LupusCommandFramework")
-@Dependency(value = "MCGUIFramework")
-@Dependency(value = "LuckPerms")
-@ApiVersion(value =  ApiVersion.Target.v1_15)
+    override fun onDisable() {
+        ChestManager.saveAll(false)
+    }
 
-public class CaseOpener extends JavaPlugin {
-	static File dataFolder;
-	static JavaPlugin plugin;
-	static LuckPerms api;
-	private static Economy econ = null;
-	public static File getMainDataFolder(){
-		return dataFolder;
-	}
-	public static LuckPerms getLuckPermsAPI(){
-		if (api == null)
-			api = LuckPermsProvider.get();
-		return api;
-	}
+    private fun loadSerializedClasses() {
+        ConfigurationSerialization.registerClass(MinecraftCase::class.java)
+        ConfigurationSerialization.registerClass(CaseItemHolder::class.java)
+        ConfigurationSerialization.registerClass(CaseItem::class.java)
+        ConfigurationSerialization.registerClass(PlayerKey::class.java)
+    }
 
-	public static JavaPlugin getMainPlugin() {
-		return plugin;
-	}
-	public static Economy getEconomy(){
-		return econ;
-	}
+    private fun setupEconomy(): Boolean {
+        if (server.pluginManager.getPlugin("Vault") == null) {
+            return false
+        }
+        val rsp = server.servicesManager.getRegistration(
+            Economy::class.java) ?: return false
+        economy = rsp.provider
+        return economy != null
+    }
 
-	@Override
-	public void onEnable() {
-		info("Loading CaseOpener");
-		plugin = this;
-		dataFolder = this.getDataFolder();
-		info("Hooking into vault");
-		if (!setupEconomy() ) {
-			getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
-		info("Hooked into Vault successfully");
-		info("Setting up luck perms");
-		setupLuckPerms();
-		info("Luck Perms API set up");
+    fun setupLuckPerms() {
+        val provider = Bukkit.getServicesManager().getRegistration(
+            LuckPerms::class.java)
+        if (provider != null) {
+            api = provider.provider
+        }
+    }
 
-		info("Loading serialized classes");
-		loadSerializedClasses();
-		info("Serialized classes loaded");
+    companion object {
+        var mainDataFolder: File? = null
+        lateinit var mainPlugin: CaseOpener
+        var api: LuckPerms? = null
+        var economy: Economy? = null
+            private set
+        val luckPermsAPI: LuckPerms?
+            get() {
+                if (api == null) api = LuckPermsProvider.get()
+                return api
+            }
 
-		info("Loading messages");
-		Message.load();
-		info("All messages loaded!");
+        fun NamespacedKey(key: String?): NamespacedKey {
+            return NamespacedKey(mainPlugin!!, key!!)
+        }
 
-		getServer().getPluginManager().registerEvents(new BlockManipulationListener(),plugin);
-		getServer().getPluginManager().registerEvents(new PvEListener(),plugin);
-		getServer().getPluginManager().registerEvents(new InventoryListener(),plugin);
+        fun info(info: String?) {
+            Bukkit.getLogger().info(info)
+        }
 
-		info("Started Loading Chests");
-		loadChests();
-		info("Chests loaded");
-		info("amount:"+ChestManager.getAll().size());
-		ArgumentType.addArgumentTypeInterpreter(new ArgumentType(MinecraftCase.class,(arg)-> ChestManager.getCase(arg[0])));
-	}
-	public static NamespacedKey NamespacedKey(String key){
-		return new NamespacedKey(getMainPlugin(),key);
-	}
-	public static void info(String info){
-		Bukkit.getLogger().info(info);
-	}
-	@Override
-	public void onDisable(){
-		ChestManager.saveAll(false);
-	}
-	public static void loadChests() {
-		ChestManager.clear();
-		File chestDir = new File(dataFolder+"/chests");
-		info(chestDir.getPath());
-		File[] chestFiles = chestDir.listFiles();
-		if(chestFiles == null)
-			return;
-		for (File chestFile : chestFiles) {
-			FileConfiguration file = YamlConfiguration.loadConfiguration(chestFile);
-			MinecraftCase minecraftCase = (MinecraftCase) file.get("Chest");
-
-			if (minecraftCase != null) {
-				ChestManager.addCase(minecraftCase);
-				minecraftCase.forceTopUpdate(false);
-				ItemStack chest = minecraftCase.getItemRepresentation(null);
-				var sT = new SelectableTop(chest,minecraftCase,null);
-				TopKeysGUI.selectableTops.add(sT);
-			}
-
-		}
-
-	}
-	private void loadSerializedClasses() {
-		ConfigurationSerialization.registerClass(MinecraftCase.class);
-		ConfigurationSerialization.registerClass(CaseItemHolder.class);
-		ConfigurationSerialization.registerClass(CaseItem.class);
-		ConfigurationSerialization.registerClass(PlayerKey.class);
-	}
-	private boolean setupEconomy() {
-		if (getServer().getPluginManager().getPlugin("Vault") == null) {
-			return false;
-		}
-		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-		if (rsp == null) {
-			return false;
-		}
-		econ = rsp.getProvider();
-		return econ != null;
-	}
-	void setupLuckPerms(){
-		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if (provider != null) {
-			api = provider.getProvider();
-		}
-	}
+        fun loadChests() {
+            ChestManager.clear()
+            val chestDir = File(mainDataFolder.toString() + "/chests")
+            info(chestDir.path)
+            val chestFiles = chestDir.listFiles() ?: return
+            for (chestFile in chestFiles) {
+                val file: FileConfiguration = YamlConfiguration.loadConfiguration(
+                    chestFile!!)
+                val minecraftCase = file["Chest"] as MinecraftCase?
+                if (minecraftCase != null) {
+                    ChestManager.addCase(minecraftCase)
+                    minecraftCase.forceTopUpdate(false)
+                    val chest = minecraftCase.getItemRepresentation(null)
+                    val sT = SelectableTop(chest, minecraftCase, null)
+                    TopKeysGUI.Companion.selectableTops.add(sT)
+                }
+            }
+        }
+    }
 }

@@ -1,95 +1,96 @@
-package com.lupus.opener.managers;
+package com.lupus.opener.managers
 
+import com.lupus.opener.chests.MinecraftCase
+import com.lupus.opener.CaseOpener
+import com.lupus.opener.chests.MinecraftKey
+import com.lupus.opener.runnables.ChestSave
+import org.bukkit.Location
+import org.bukkit.block.Block
+import org.bukkit.entity.Player
+import java.util.*
 
-import com.lupus.opener.CaseOpener;
-import com.lupus.opener.chests.MinecraftCase;
-import com.lupus.opener.chests.MinecraftKey;
-import com.lupus.opener.runnables.ChestSave;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+object ChestManager {
+    private val mcCases = HashMap<String, MinecraftCase>()
+    private val mcCaseLocation = HashMap<Location, String>()
+    fun clear() {
+        mcCaseLocation.clear()
+        mcCases.clear()
+    }
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Set;
+    var highestWeight = 0
+    fun addCase(mcCase: MinecraftCase) {
+        if (mcCase.caseWeight > highestWeight) {
+            highestWeight = mcCase.caseWeight
+        }
+        mcCases[mcCase.name?.toLowerCase() ?: ""] = mcCase
+    }
 
-public final class ChestManager {
-	private static final HashMap<String, MinecraftCase> mcCases = new HashMap<>();
-	private static final HashMap<Location,String> mcCaseLocation = new HashMap<>();
+    val randomCase: MinecraftCase
+        get() {
+            var highestWeight = 0
+            for (mcCase in allCases) {
+                if (highestWeight < mcCase.caseWeight) highestWeight = mcCase.caseWeight
+            }
+            highestWeight /= 100
+            var leastWeight: MinecraftCase = allCases.random()
+            val rnd = Random()
+            for (mcCase in allCases) {
+                val random: Int = rnd.nextInt(mcCase.caseWeight) + highestWeight
+                if (random > mcCase.caseWeight) {
+                    return mcCase
+                }
+                if (leastWeight == null) leastWeight =
+                    mcCase else if (leastWeight.caseWeight > mcCase.caseWeight) leastWeight = mcCase
+            }
+            return leastWeight
+        }
 
-	public static void clear(){
-		mcCaseLocation.clear();
-		mcCases.clear();
-	}
-	static int highestWeight = 0;
-	public static void addCase(@NotNull MinecraftCase mcCase){
-		if (mcCase.getCaseWeight() > highestWeight){
-			highestWeight = mcCase.getCaseWeight();
-		}
-		mcCases.put(mcCase.getName().toLowerCase(),mcCase);
-	}
-	public static MinecraftCase getRandomCase(){
-		int highestWeight = 0;
-		for (MinecraftCase mcCase : getAllCases()) {
-			if (highestWeight < mcCase.getCaseWeight())
-				highestWeight = mcCase.getCaseWeight();
-		}
-		highestWeight /= 100;
-		MinecraftCase leastWeight = null;
-		var rnd = new Random();
-		for (MinecraftCase mcCase : getAllCases()) {
-			int random = rnd.nextInt(mcCase.getCaseWeight())+highestWeight;
-			if (random > mcCase.getCaseWeight()){
-				return mcCase;
-			}
-			if (leastWeight == null)
-				leastWeight = mcCase;
-			else if (leastWeight.getCaseWeight() > mcCase.getCaseWeight())
-				leastWeight = mcCase;
-		}
-		return leastWeight;
-	}
-	public static void addCaseLocation(Location loc,String name){
-		mcCaseLocation.put(loc,name.toLowerCase());
-	}
-	public static MinecraftCase getCase(String name){
-		return mcCases.get(name.toLowerCase());
-	}
-	public static boolean contains(String chest){
-		return mcCases.containsKey(chest.toLowerCase());
-	}
-	public static MinecraftKey[] getKeysForPlayer(Player p){
-		Collection<MinecraftCase> c = mcCases.values();
-		MinecraftKey[] keys = new MinecraftKey[c.size()];
-		int i=0;
-		for (MinecraftCase minecraftCase : c) {
-			keys[i] = new MinecraftKey(minecraftCase.getName(),minecraftCase.getKeyAmount(p));
-			i++;
-		}
-		return keys;
-	}
-	public static MinecraftCase getCaseFromLocation(Location location){
-		return mcCases.get(mcCaseLocation.get(location));
-	}
-	public static boolean removeCaseLocation(Block block){
-		return removeCaseLocation(block.getLocation());
-	}
-	public static boolean removeCaseLocation(Location loc){
-		String r = mcCaseLocation.remove(loc);
-		return r != null;
-	}
-	public static Set<String> getAll(){
-		return mcCases.keySet();
-	}
-	public static Collection<MinecraftCase> getAllCases() { return mcCases.values();}
-	public static void saveAll(boolean async){
-		if (async) {
-			new ChestSave(mcCases).runTaskAsynchronously(CaseOpener.getMainPlugin());
-		}
-		else{
-			new ChestSave(mcCases).run();
-		}
-	}
+    fun addCaseLocation(loc: Location, name: String?) {
+        mcCaseLocation[loc] = name!!.toLowerCase()
+    }
+
+    fun getCase(name: String?): MinecraftCase? {
+        return mcCases[name!!.toLowerCase()]
+    }
+
+    operator fun contains(chest: String): Boolean {
+        return mcCases.containsKey(chest.toLowerCase())
+    }
+
+    fun getKeysForPlayer(p: Player): Array<MinecraftKey?> {
+        val c: Collection<MinecraftCase> = mcCases.values
+        val keys = arrayOfNulls<MinecraftKey>(c.size)
+        var i = 0
+        for (minecraftCase in c) {
+            keys[i] = MinecraftKey(minecraftCase.name, minecraftCase.getKeyAmount(p))
+            i++
+        }
+        return keys
+    }
+
+    fun getCaseFromLocation(location: Location): MinecraftCase? {
+        return mcCases[mcCaseLocation[location]]
+    }
+
+    fun removeCaseLocation(block: Block): Boolean {
+        return removeCaseLocation(block.location)
+    }
+
+    fun removeCaseLocation(loc: Location): Boolean {
+        val r = mcCaseLocation.remove(loc)
+        return r != null
+    }
+
+    val all: Set<String>
+        get() = mcCases.keys
+    val allCases: Collection<MinecraftCase>
+        get() = mcCases.values
+
+    fun saveAll(async: Boolean) {
+        if (async) {
+            CaseOpener.mainPlugin.let { ChestSave(mcCases).runTaskAsynchronously(it) }
+        } else {
+            ChestSave(mcCases).run()
+        }
+    }
 }

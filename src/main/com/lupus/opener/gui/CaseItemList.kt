@@ -1,81 +1,141 @@
-package com.lupus.opener.gui;
+package com.lupus.opener.gui
 
-import com.lupus.gui.Paginator;
-import com.lupus.gui.utils.TextUtility;
-import com.lupus.opener.chests.CaseItem;
-import com.lupus.opener.chests.CaseItemHolder;
-import com.lupus.opener.chests.MinecraftCase;
-import com.lupus.opener.gui.selectables.SelectableItemEditor;
-import com.lupus.opener.messages.Message;
-import com.lupus.opener.messages.MessageReplaceQuery;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import com.lupus.gui.TopPyramidGUI
+import com.lupus.opener.chests.MinecraftCase
+import java.util.UUID
+import com.lupus.gui.SelectableItem
+import com.lupus.gui.IGUI
+import com.lupus.gui.utils.SkullUtility
+import com.lupus.gui.utils.ItemUtility
+import java.util.Arrays
+import com.lupus.opener.gui.top.GUITopCase
+import com.lupus.gui.utils.TextUtility
+import com.lupus.gui.PlayerSelectableItem
+import com.lupus.opener.gui.ItemEditor
+import com.lupus.gui.Paginator
+import java.text.DecimalFormat
+import com.lupus.opener.managers.ChestManager
+import com.lupus.opener.gui.selectables.SelectableCase
+import net.luckperms.api.LuckPerms
+import com.lupus.opener.CaseOpener
+import net.luckperms.api.query.QueryOptions
+import net.luckperms.api.query.QueryMode
+import com.lupus.opener.gui.BuyCaseGUI
+import com.lupus.opener.gui.selectables.SelectableCommand
+import com.lupus.gui.GUI
+import com.lupus.opener.gui.BuyKeysCMD
+import com.lupus.gui.utils.InventoryUtility
+import com.lupus.opener.chests.CaseItem
+import com.lupus.opener.gui.selectables.SelectableTop
+import com.lupus.opener.gui.TopKeysGUI
+import com.lupus.opener.gui.OpeningCase
+import com.lupus.opener.managers.OpenerManager
+import com.lupus.opener.chests.CaseItemHolder
+import com.lupus.opener.gui.selectables.SelectableItemEditor
+import com.lupus.opener.chests.utils.MinecraftCaseUtils
+import com.lupus.gui.utils.NBTUtility
+import java.util.HashMap
+import java.util.TreeMap
+import com.lupus.opener.chests.PlayerKey
+import com.lupus.opener.gui.CaseItemList
+import com.lupus.opener.runnables.ChestOpener
+import java.lang.StringBuilder
+import java.util.LinkedList
+import java.lang.Runnable
+import com.lupus.command.framework.commands.PlayerCommand
+import com.lupus.opener.commands.sub.admin.GetCaseCMD
+import kotlin.Throws
+import com.lupus.command.framework.commands.LupusCommand
+import com.lupus.command.framework.commands.CommandMeta
+import com.lupus.opener.commands.sub.admin.GiveKeyCMD
+import com.lupus.opener.commands.sub.admin.SetIconCMD
+import com.lupus.opener.commands.sub.admin.OpenCaseCMD
+import com.lupus.opener.commands.sub.admin.ReloadAllCMD
+import com.lupus.opener.commands.sub.admin.RemoveKeyCMD
+import com.lupus.opener.commands.sub.admin.SaveCasesCMD
+import com.lupus.opener.commands.sub.admin.EditWeightCMD
+import com.lupus.opener.commands.sub.admin.GetCobblexCMD
+import com.lupus.opener.commands.sub.admin.OpenEditorCMD
+import com.lupus.opener.gui.ChestList
+import com.lupus.opener.commands.sub.admin.ResetAccountCMD
+import com.lupus.opener.commands.sub.admin.CreateNewCaseCMD
+import com.lupus.opener.commands.sub.admin.AllowDestructionCMD
+import com.lupus.opener.listeners.BlockManipulationListener
+import com.lupus.opener.commands.sub.admin.SetStatTrackCommand
+import com.lupus.opener.commands.sub.player.KeysCMD
+import com.lupus.opener.chests.MinecraftKey
+import com.lupus.opener.commands.sub.player.BuyKeyCMD
+import com.lupus.opener.commands.sub.player.KeyTopCMD
+import com.lupus.opener.commands.sub.player.ChangeKeyCMD
+import com.lupus.opener.commands.sub.player.RandomCaseDaily
+import java.time.Instant
+import com.lupus.opener.commands.sub.player.GetCraftedCobblex
+import com.lupus.opener.commands.sub.player.KeyTransactionCMD
+import com.lupus.command.framework.commands.arguments.UInteger
+import com.lupus.opener.commands.sub.player.WithdrawKeyCommand
+import java.lang.IllegalArgumentException
+import java.util.HashSet
+import com.lupus.command.framework.commands.SupCommand
+import com.lupus.command.framework.commands.PlayerSupCommand
+import com.lupus.opener.commands.PlayerCaseCommand
+import com.lupus.opener.runnables.ChestSave
+import com.lupus.gui.utils.ConfigUtility
+import org.bukkit.plugin.java.annotation.plugin.author.Author
+import org.bukkit.plugin.java.annotation.plugin.Website
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion
+import com.lupus.opener.listeners.PvEListener
+import com.lupus.opener.listeners.InventoryListener
+import com.lupus.command.framework.commands.arguments.ArgumentRunner
+import com.lupus.opener.messages.Message
+import com.lupus.opener.messages.MessageReplaceQuery
+import net.milkbowl.vault.economy.Economy
+import net.luckperms.api.LuckPermsProvider
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryClickEvent
+import java.util.ArrayList
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+class CaseItemList(var mcCase: MinecraftCase, player: Player?) : Paginator(mcCase.officialName1) {
+    var dropItems: CaseItemHolder?
+    private fun openNewItemCreation(p: Player) {
+        if (!p.hasPermission("case.admin")) return
+        val itemEditor = ItemEditor(inventoryName, mcCase.dropTable?.itemCount ?: 0, mcCase)
+        itemEditor.open(p)
+    }
 
-public class CaseItemList extends Paginator {
-	CaseItemHolder dropItems;
-	MinecraftCase mcCase;
-	public CaseItemList(MinecraftCase minecraftCase,Player player){
-		super(minecraftCase.getOfficialName());
-		mcCase = minecraftCase;
-		this.dropItems = minecraftCase.getDropTable();
-		int n=0;
-		DecimalFormat df2 = new DecimalFormat("#.####");
-		for (CaseItem caseItem : dropItems.items){
-			ItemStack item = caseItem.getItem();
-			ItemMeta meta = item.getItemMeta();
-			List<String> lore = meta.getLore();
-			if(lore == null){
-				lore = new ArrayList<>();
-			}
-			float chance;
-			chance = ((float)caseItem.getWeight())/((float)dropItems.getMaxWeight());
-			chance *= 100;
+    override fun onClickedItemNull(player: Player, inventoryClickEvent: InventoryClickEvent) {
+        openNewItemCreation(player)
+    }
 
-			var mrq = new MessageReplaceQuery().
-					addQuery("chance",df2.format(chance));
+    override fun onSlotInteraction(player: Player, e: InventoryClickEvent) {
+        if (!player.hasPermission("case.admin")) return
+        super.onSlotInteraction(player, e)
+    }
 
-			String[] messages = Message.DROP_CHANCE_LORE.toString(mrq).split("\\n");
+    override fun onClose(p: Player) {}
 
-			lore.addAll(Arrays.asList(messages));
-
-			meta.setLore(lore);
-			item.setItemMeta(meta);
-
-			ItemEditor itemEditor = new ItemEditor(minecraftCase.getOfficialName(), n, mcCase);
-
-			this.addItemStack(new SelectableItemEditor(item,itemEditor,player));
-			n++;
-		}
-		setPage(0);
-	}
-
-	private void openNewItemCreation(Player p){
-		if (!p.hasPermission("case.admin"))
-			return;
-		ItemEditor itemEditor = new ItemEditor(getInventoryName(), mcCase.getDropTable().getItemCount(), mcCase);
-		itemEditor.open(p);
-	}
-
-	@Override
-	public void onClickedItemNull(Player player, InventoryClickEvent inventoryClickEvent) {
-		openNewItemCreation(player);
-	}
-
-	@Override
-	public void onSlotInteraction(Player player, InventoryClickEvent e) {
-		if (!player.hasPermission("case.admin"))
-			return;
-		super.onSlotInteraction(player, e);
-	}
-
-	@Override
-	public void onClose(Player p){
-	}
+    init {
+        dropItems = mcCase.dropTable
+        var n = 0
+        val df2 = DecimalFormat("#.####")
+        for (caseItem in dropItems!!.items!!) {
+            val item = caseItem!!.getItem()
+            val meta = item!!.itemMeta
+            var lore = meta.lore
+            if (lore == null) {
+                lore = ArrayList()
+            }
+            var chance: Float
+            chance = caseItem.weight as Float / dropItems?.maxWeight as Float
+            chance *= 100f
+            val mrq = MessageReplaceQuery().addQuery("chance", df2.format(chance.toDouble()))
+            val messages: Array<String> = Message.DROP_CHANCE_LORE.toString(mrq).split("\\n".toRegex()).toTypedArray()
+            lore.addAll(Arrays.asList(*messages))
+            meta.lore = lore
+            item.setItemMeta(meta)
+            val itemEditor = ItemEditor(mcCase.officialName1, n, mcCase)
+            addItemStack(SelectableItemEditor(item, itemEditor, player))
+            n++
+        }
+        setPage(0)
+    }
 }

@@ -1,56 +1,132 @@
-package com.lupus.opener.listeners;
+package com.lupus.opener.listeners
 
-import com.lupus.gui.utils.NBTUtility;
-import com.lupus.gui.utils.TextUtility;
-import com.lupus.opener.messages.Message;
-import com.lupus.opener.messages.MessageReplaceQuery;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
+import com.lupus.gui.TopPyramidGUI
+import com.lupus.opener.chests.MinecraftCase
+import java.util.UUID
+import com.lupus.gui.SelectableItem
+import com.lupus.gui.IGUI
+import com.lupus.gui.utils.SkullUtility
+import com.lupus.gui.utils.ItemUtility
+import java.util.Arrays
+import com.lupus.opener.gui.top.GUITopCase
+import com.lupus.gui.utils.TextUtility
+import com.lupus.gui.PlayerSelectableItem
+import com.lupus.opener.gui.ItemEditor
+import com.lupus.gui.Paginator
+import java.text.DecimalFormat
+import com.lupus.opener.managers.ChestManager
+import com.lupus.opener.gui.selectables.SelectableCase
+import net.luckperms.api.LuckPerms
+import com.lupus.opener.CaseOpener
+import net.luckperms.api.query.QueryOptions
+import net.luckperms.api.query.QueryMode
+import com.lupus.opener.gui.BuyCaseGUI
+import com.lupus.opener.gui.selectables.SelectableCommand
+import com.lupus.gui.GUI
+import com.lupus.opener.gui.BuyKeysCMD
+import com.lupus.gui.utils.InventoryUtility
+import com.lupus.opener.chests.CaseItem
+import com.lupus.opener.gui.selectables.SelectableTop
+import com.lupus.opener.gui.TopKeysGUI
+import com.lupus.opener.gui.OpeningCase
+import com.lupus.opener.managers.OpenerManager
+import com.lupus.opener.chests.CaseItemHolder
+import com.lupus.opener.gui.selectables.SelectableItemEditor
+import com.lupus.opener.chests.utils.MinecraftCaseUtils
+import com.lupus.gui.utils.NBTUtility
+import java.util.HashMap
+import java.util.TreeMap
+import com.lupus.opener.chests.PlayerKey
+import com.lupus.opener.gui.CaseItemList
+import com.lupus.opener.runnables.ChestOpener
+import java.lang.StringBuilder
+import java.util.LinkedList
+import java.lang.Runnable
+import com.lupus.command.framework.commands.PlayerCommand
+import com.lupus.opener.commands.sub.admin.GetCaseCMD
+import kotlin.Throws
+import com.lupus.command.framework.commands.LupusCommand
+import com.lupus.command.framework.commands.CommandMeta
+import com.lupus.opener.commands.sub.admin.GiveKeyCMD
+import com.lupus.opener.commands.sub.admin.SetIconCMD
+import com.lupus.opener.commands.sub.admin.OpenCaseCMD
+import com.lupus.opener.commands.sub.admin.ReloadAllCMD
+import com.lupus.opener.commands.sub.admin.RemoveKeyCMD
+import com.lupus.opener.commands.sub.admin.SaveCasesCMD
+import com.lupus.opener.commands.sub.admin.EditWeightCMD
+import com.lupus.opener.commands.sub.admin.GetCobblexCMD
+import com.lupus.opener.commands.sub.admin.OpenEditorCMD
+import com.lupus.opener.gui.ChestList
+import com.lupus.opener.commands.sub.admin.ResetAccountCMD
+import com.lupus.opener.commands.sub.admin.CreateNewCaseCMD
+import com.lupus.opener.commands.sub.admin.AllowDestructionCMD
+import com.lupus.opener.listeners.BlockManipulationListener
+import com.lupus.opener.commands.sub.admin.SetStatTrackCommand
+import com.lupus.opener.commands.sub.player.KeysCMD
+import com.lupus.opener.chests.MinecraftKey
+import com.lupus.opener.commands.sub.player.BuyKeyCMD
+import com.lupus.opener.commands.sub.player.KeyTopCMD
+import com.lupus.opener.commands.sub.player.ChangeKeyCMD
+import com.lupus.opener.commands.sub.player.RandomCaseDaily
+import java.time.Instant
+import com.lupus.opener.commands.sub.player.GetCraftedCobblex
+import com.lupus.opener.commands.sub.player.KeyTransactionCMD
+import com.lupus.command.framework.commands.arguments.UInteger
+import com.lupus.opener.commands.sub.player.WithdrawKeyCommand
+import java.lang.IllegalArgumentException
+import java.util.HashSet
+import com.lupus.command.framework.commands.SupCommand
+import com.lupus.command.framework.commands.PlayerSupCommand
+import com.lupus.opener.commands.PlayerCaseCommand
+import com.lupus.opener.runnables.ChestSave
+import com.lupus.gui.utils.ConfigUtility
+import org.bukkit.plugin.java.annotation.plugin.author.Author
+import org.bukkit.plugin.java.annotation.plugin.Website
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion
+import com.lupus.opener.listeners.PvEListener
+import com.lupus.opener.listeners.InventoryListener
+import com.lupus.command.framework.commands.arguments.ArgumentRunner
+import com.lupus.opener.messages.Message
+import com.lupus.opener.messages.MessageReplaceQuery
+import net.milkbowl.vault.economy.Economy
+import net.luckperms.api.LuckPermsProvider
+import org.bukkit.ChatColor
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDeathEvent
 
-import java.util.List;
+class PvEListener : Listener {
+    @EventHandler
+    fun onPlayerKill(e: EntityDeathEvent) {
+        if (e.entity !is Player) {
+            return
+        }
+        val p = e.entity as Player
+        val killer = p.killer ?: return
+        val killerInventory = killer.inventory
+        val it = killerInventory.itemInMainHand
+        if (NBTUtility.hasNBTTag(it, "StarKiller")) {
+            var kills = NBTUtility.getNBTValue(it, "StarKiller", Int::class.javaPrimitiveType)
+            kills++
+            NBTUtility.setNBTDataValue(it, "StarKiller", kills)
+            val meta = it.itemMeta
+            val lore = meta.lore
+            for (i in lore!!.indices) {
+                val s = lore[i]
+                if (strip(s)!!.contains("Kills")) {
+                    val mrq = MessageReplaceQuery().addQuery("amount", kills.toString() + "")
+                    lore[i] = Message.STATTRACK_KILLS_FORMATING.toString(mrq)
+                }
+            }
+            meta.lore = lore
+            it.setItemMeta(meta)
+            killerInventory.setItemInMainHand(it)
+            killer.updateInventory()
+        }
+    }
 
-public class PvEListener implements Listener {
-	@EventHandler
-	public void onPlayerKill(EntityDeathEvent e){
-		if (!(e.getEntity() instanceof Player)) {
-			return;
-		}
-		Player p = ((Player) e.getEntity());
-		Player killer = p.getKiller();
-		if (killer == null){
-			return;
-		}
-		PlayerInventory killerInventory = killer.getInventory();
-		ItemStack it = killerInventory.getItemInMainHand();
-		if (NBTUtility.hasNBTTag(it,"StarKiller")) {
-			int kills  = NBTUtility.getNBTValue(it, "StarKiller",int.class);
-			kills++;
-
-			NBTUtility.setNBTDataValue(it,"StarKiller",kills);
-
-			ItemMeta meta = it.getItemMeta();
-			List<String> lore = meta.getLore();
-			for (int i=0;i<lore.size();i++){
-				String s = lore.get(i);
-				if (strip(s).contains("Kills")){
-					var mrq = new MessageReplaceQuery().
-							addQuery("amount",kills+"");
-					lore.set(i, Message.STATTRACK_KILLS_FORMATING.toString(mrq));
-				}
-			}
-			meta.setLore(lore);
-			it.setItemMeta(meta);
-			killerInventory.setItemInMainHand(it);
-			killer.updateInventory();
-		}
-	}
-	public String strip(String s){
-		return ChatColor.stripColor(s);
-	}
+    fun strip(s: String?): String? {
+        return ChatColor.stripColor(s)
+    }
 }

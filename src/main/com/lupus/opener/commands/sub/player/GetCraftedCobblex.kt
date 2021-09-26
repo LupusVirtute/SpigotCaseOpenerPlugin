@@ -1,57 +1,136 @@
-package com.lupus.opener.commands.sub.player;
+package com.lupus.opener.commands.sub.player
 
-import com.lupus.command.framework.commands.CommandMeta;
-import com.lupus.command.framework.commands.PlayerCommand;
-import com.lupus.command.framework.commands.arguments.ArgumentList;
-import com.lupus.opener.managers.ChestManager;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import com.lupus.gui.TopPyramidGUI
+import com.lupus.opener.chests.MinecraftCase
+import java.util.UUID
+import com.lupus.gui.SelectableItem
+import com.lupus.gui.IGUI
+import com.lupus.gui.utils.SkullUtility
+import com.lupus.gui.utils.ItemUtility
+import java.util.Arrays
+import com.lupus.opener.gui.top.GUITopCase
+import com.lupus.gui.utils.TextUtility
+import com.lupus.gui.PlayerSelectableItem
+import com.lupus.opener.gui.ItemEditor
+import com.lupus.gui.Paginator
+import java.text.DecimalFormat
+import com.lupus.opener.managers.ChestManager
+import com.lupus.opener.gui.selectables.SelectableCase
+import net.luckperms.api.LuckPerms
+import com.lupus.opener.CaseOpener
+import net.luckperms.api.query.QueryOptions
+import net.luckperms.api.query.QueryMode
+import com.lupus.opener.gui.BuyCaseGUI
+import com.lupus.opener.gui.selectables.SelectableCommand
+import com.lupus.gui.GUI
+import com.lupus.opener.gui.BuyKeysCMD
+import com.lupus.gui.utils.InventoryUtility
+import com.lupus.opener.chests.CaseItem
+import com.lupus.opener.gui.selectables.SelectableTop
+import com.lupus.opener.gui.TopKeysGUI
+import com.lupus.opener.gui.OpeningCase
+import com.lupus.opener.managers.OpenerManager
+import com.lupus.opener.chests.CaseItemHolder
+import com.lupus.opener.gui.selectables.SelectableItemEditor
+import com.lupus.opener.chests.utils.MinecraftCaseUtils
+import com.lupus.gui.utils.NBTUtility
+import java.util.HashMap
+import java.util.TreeMap
+import com.lupus.opener.chests.PlayerKey
+import com.lupus.opener.gui.CaseItemList
+import com.lupus.opener.runnables.ChestOpener
+import java.lang.StringBuilder
+import java.util.LinkedList
+import java.lang.Runnable
+import com.lupus.command.framework.commands.PlayerCommand
+import com.lupus.opener.commands.sub.admin.GetCaseCMD
+import kotlin.Throws
+import com.lupus.command.framework.commands.LupusCommand
+import com.lupus.command.framework.commands.CommandMeta
+import com.lupus.opener.commands.sub.admin.GiveKeyCMD
+import com.lupus.opener.commands.sub.admin.SetIconCMD
+import com.lupus.opener.commands.sub.admin.OpenCaseCMD
+import com.lupus.opener.commands.sub.admin.ReloadAllCMD
+import com.lupus.opener.commands.sub.admin.RemoveKeyCMD
+import com.lupus.opener.commands.sub.admin.SaveCasesCMD
+import com.lupus.opener.commands.sub.admin.EditWeightCMD
+import com.lupus.opener.commands.sub.admin.GetCobblexCMD
+import com.lupus.opener.commands.sub.admin.OpenEditorCMD
+import com.lupus.opener.gui.ChestList
+import com.lupus.opener.commands.sub.admin.ResetAccountCMD
+import com.lupus.opener.commands.sub.admin.CreateNewCaseCMD
+import com.lupus.opener.commands.sub.admin.AllowDestructionCMD
+import com.lupus.opener.listeners.BlockManipulationListener
+import com.lupus.opener.commands.sub.admin.SetStatTrackCommand
+import com.lupus.opener.commands.sub.player.KeysCMD
+import com.lupus.opener.chests.MinecraftKey
+import com.lupus.opener.commands.sub.player.BuyKeyCMD
+import com.lupus.opener.commands.sub.player.KeyTopCMD
+import com.lupus.opener.commands.sub.player.ChangeKeyCMD
+import com.lupus.opener.commands.sub.player.RandomCaseDaily
+import java.time.Instant
+import com.lupus.opener.commands.sub.player.GetCraftedCobblex
+import com.lupus.opener.commands.sub.player.KeyTransactionCMD
+import com.lupus.command.framework.commands.arguments.UInteger
+import com.lupus.opener.commands.sub.player.WithdrawKeyCommand
+import java.lang.IllegalArgumentException
+import java.util.HashSet
+import com.lupus.command.framework.commands.SupCommand
+import com.lupus.command.framework.commands.PlayerSupCommand
+import com.lupus.command.framework.commands.arguments.ArgumentList
+import com.lupus.opener.commands.PlayerCaseCommand
+import com.lupus.opener.runnables.ChestSave
+import com.lupus.gui.utils.ConfigUtility
+import org.bukkit.plugin.java.annotation.plugin.author.Author
+import org.bukkit.plugin.java.annotation.plugin.Website
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion
+import com.lupus.opener.listeners.PvEListener
+import com.lupus.opener.listeners.InventoryListener
+import com.lupus.command.framework.commands.arguments.ArgumentRunner
+import net.milkbowl.vault.economy.Economy
+import net.luckperms.api.LuckPermsProvider
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.inventory.Inventory
+import java.lang.Exception
 
-public class GetCraftedCobblex extends PlayerCommand {
-	static CommandMeta meta = new CommandMeta().
-			setName("cobblex").
-			setArgumentAmount(0).
-			setDescription("Craftuje za ciebie cały cobblex").
-			setUsage("/cobblex");
-	public GetCraftedCobblex() {
-		super(meta);
-	}
+class GetCraftedCobblex : PlayerCommand(meta) {
+    @Throws(Exception::class)
+    override fun run(player: Player, argumentList: ArgumentList) {
+        val inventory = player.inventory
+        val contains = countItemsInInv(inventory, Material.COBBLESTONE) >= 64 * 9
+        if (contains) {
+            removeItemsFromInventory(inventory, Material.COBBLESTONE, 64 * 9)
+            inventory.addItem(ChestManager.randomCase.cobblex)
+        }
+    }
 
-	@Override
-	protected void run(Player player, ArgumentList argumentList) throws Exception {
-		var inventory = player.getInventory();
-		var contains = countItemsInInv(inventory,Material.COBBLESTONE) >= (64*9);
-		if (contains){
-			removeItemsFromInventory(inventory,Material.COBBLESTONE,64*9);
-			inventory.addItem(ChestManager.getRandomCase().getCobblex());
-		}
-	}
-	private int countItemsInInv(Inventory inv,Material mat){
-		int count = 0;
-		for (ItemStack content : inv.getContents()) {
-			if (content != null)
-				if (content.getType() == mat) {
-					count += content.getAmount();
-				}
-		}
-		return count;
-	}
-	private void removeItemsFromInventory(Inventory inv, Material mat, int amount){
-		for (ItemStack content : inv.getContents()) {
-			if (amount <= 0)
-				break;
-			if (content != null)
-				if (content.getType() == mat) {
-					var amountNeeded = 0;
-					if (amount > content.getAmount())
-						amountNeeded = content.getAmount() % amount;
-					else
-						amountNeeded = content.getAmount();
-					content.setAmount(content.getAmount() - amountNeeded);
-					amount -= amountNeeded;
-				}
-		}
-	}
+    private fun countItemsInInv(inv: Inventory, mat: Material): Int {
+        var count = 0
+        for (content in inv.contents) {
+            if (content != null) if (content.type == mat) {
+                count += content.amount
+            }
+        }
+        return count
+    }
+
+    private fun removeItemsFromInventory(inv: Inventory, mat: Material, amount: Int) {
+        var amount = amount
+        for (content in inv.contents) {
+            if (amount <= 0) break
+            if (content != null) if (content.type == mat) {
+                var amountNeeded = 0
+                amountNeeded = if (amount > content.amount) content.amount % amount else content.amount
+                content.amount = content.amount - amountNeeded
+                amount -= amountNeeded
+            }
+        }
+    }
+
+    companion object {
+        var meta =
+            CommandMeta().setName("cobblex").setArgumentAmount(0).setDescription("Craftuje za ciebie cały cobblex")
+                .setUsage("/cobblex")
+    }
 }
